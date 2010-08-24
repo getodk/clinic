@@ -266,14 +266,12 @@ public class FindPatientActivity extends ListActivity {
 
 	@Override
 	protected void onResume() {
-/*
 		String s = mSearchText.getText().toString();
 		if (s != null && s.length() > 0) {
 			getFoundPatients(s);
 		} else {
 			getAllPatients();
 		}
-*/
 		super.onResume();
 	}
 
