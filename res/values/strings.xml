@@ -37,5 +37,5 @@ the License.
 <string name="error">Error: %s</string>
 <string name="downloading_patients">Downloading patients...</string>
 <string name="connecting_server">Connecting...</string>
-
+<string name="search_hint">Type name or id...</string>
 </resources>

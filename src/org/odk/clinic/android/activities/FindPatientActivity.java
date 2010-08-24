@@ -29,12 +29,12 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-//TODO: multiple cohorts
-//TODO: download cohort list
 //TODO: live search
+//TODO: fix search by patient id
+//TODO: download cohort list
+//TODO: multiple cohorts
 //TODO: error correction if connection fails
-//TODO: ages instead of dates
-//TODO: search by patient id
+//TODO: display ages instead of dates
 //TODO: stronger typing of data in db
 //TODO: differential and faster download
 //TODO: more underlying data
