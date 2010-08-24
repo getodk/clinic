@@ -1,0 +1,34 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+    		android:id="@+id/server"
+            android:key="server"
+            android:defaultValue="@string/default_server"
+            android:title="@string/server"
+            android:dialogTitle="@string/change_server" />
+            
+    <EditTextPreference
+            android:id="@+id/username"
+            android:key="username"
+            android:defaultValue="@string/default_username"
+            android:title="@string/username"
+            android:dialogTitle="@string/change_username" />
+            
+    <EditTextPreference
+            android:id="@+id/password"
+            android:key="password"
+            android:defaultValue="@string/default_password"            
+            android:title="@string/password"
+            android:dialogTitle="@string/change_password" 
+            android:password="true" />
+
+    <EditTextPreference
+            android:id="@+id/cohort"
+            android:key="cohort"
+            android:defaultValue="@string/default_cohort"            
+            android:title="@string/cohort"
+            android:dialogTitle="@string/change_cohort" 
+            android:inputType="numberSigned"/>
+            
+</PreferenceScreen>

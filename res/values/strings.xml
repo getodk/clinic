@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License. You may obtain a copy of
+the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.
+-->
+<resources>
+<string name="app_name">ODK Clinic</string>
+<string name="barcode_error">Barcode Scanner not installed.</string>
+<string name="cancel">Cancel</string>
+<string name="change_cohort">Change Cohort</string>
+<string name="change_password">Change Password</string>
+<string name="change_server">Change URL</string>
+<string name="change_username">Change Username</string>
+<string name="cohort">Cohort</string>
+<string name="default_cohort">2</string>
+<string name="default_password">test</string>
+<string name="default_server">http://rwinkwavu.cs.washington.edu:8080/openmrs</string>
+<string name="default_username">admin</string>
+<string name="download_patients">Download Patients</string>
+<string name="finding_patient">Finding patients...</string>
+<string name="find_patient">List Patients</string>
+<string name="password">Password</string>
+<string name="server">URL</string>
+<string name="server_preferences">Configure Settings</string>
+<string name="username">Username</string>
+<string name="no_items">No patients found.</string>
+<string name="error">Error: %s</string>
+<string name="downloading_patients">Downloading patients...</string>
+<string name="connecting_server">Connecting...</string>
+
+</resources>
