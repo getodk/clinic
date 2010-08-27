@@ -39,6 +39,7 @@ import android.widget.Toast;
 //TODO: differential and faster download
 //TODO: more underlying data
 //TODO: logging stuff
+//TODO: hitting enter on keyboard should do search
 
 public class FindPatientActivity extends ListActivity {
 
