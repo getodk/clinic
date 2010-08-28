@@ -25,13 +25,6 @@
             android:ellipsize="end"
              
         />
-    
-        <ImageButton
-            android:id="@+id/search_button"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:src="@drawable/ic_btn_search"
-        />
             
         <ImageButton
             android:id="@+id/barcode_button"

@@ -11,7 +11,6 @@ import org.odk.clinic.android.preferences.ServerPreferences;
 
 import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -22,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -39,7 +37,6 @@ import android.widget.Toast;
 //TODO: differential and faster download
 //TODO: more underlying data
 //TODO: logging stuff
-//TODO: hitting enter on keyboard should do search
 
 public class FindPatientActivity extends ListActivity {
 
@@ -48,11 +45,11 @@ public class FindPatientActivity extends ListActivity {
 	private static final int MENU_DOWNLOAD = Menu.FIRST;
 	private static final int MENU_PREFERENCES = MENU_DOWNLOAD + 1;
 
-	private ImageButton mSearchButton;
 	private ImageButton mBarcodeButton;
 	private EditText mSearchText;
+	private TextWatcher mFilterTextWatcher;
 
-	private InputMethodManager mInputMethodManager;
+	//private InputMethodManager mInputMethodManager;
 
 	private ArrayAdapter<Patient> mPatientAdapter;
 	private ArrayList<Patient> mPatients = new ArrayList<Patient>();
@@ -72,14 +69,13 @@ public class FindPatientActivity extends ListActivity {
 				+ getString(R.string.find_patient));
 
 		// used to hide keyboard after search
-		mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		//mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
-		mSearchText = (EditText) findViewById(R.id.search_text);
-		mSearchText.addTextChangedListener(new TextWatcher() {
+		mFilterTextWatcher = new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-				//mPatientAdapter.getFilter().filter(s);
+				mPatientAdapter.getFilter().filter(s);
 			}
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -91,23 +87,10 @@ public class FindPatientActivity extends ListActivity {
 					int after) {
 				
 			}
-
-
-		});
-
-		mSearchButton = (ImageButton) findViewById(R.id.search_button);
-		mSearchButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				String searchStr = mSearchText.getText().toString();
-				if (searchStr.length() > 0) {
-					mInputMethodManager.hideSoftInputFromWindow(
-							mSearchText.getWindowToken(), 0);
-					getFoundPatients(searchStr);
-				} else {
-					getAllPatients();
-				}
-			}
-		});
+		};
+		
+		mSearchText = (EditText) findViewById(R.id.search_text);
+		mSearchText.addTextChangedListener(mFilterTextWatcher);
 
 		mBarcodeButton = (ImageButton) findViewById(R.id.barcode_button);
 		mBarcodeButton.setOnClickListener(new OnClickListener() {
@@ -263,16 +246,20 @@ public class FindPatientActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		
+		mSearchText.removeTextChangedListener(mFilterTextWatcher);
 	}
 
 	@Override
 	protected void onResume() {
+/*
 		String s = mSearchText.getText().toString();
 		if (s != null && s.length() > 0) {
 			getFoundPatients(s);
 		} else {
 			getAllPatients();
 		}
+*/
 		super.onResume();
 	}
 

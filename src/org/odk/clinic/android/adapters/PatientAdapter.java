@@ -15,12 +15,10 @@ import android.widget.TextView;
 
 public class PatientAdapter extends ArrayAdapter<Patient> {
 	
-    private ArrayList<Patient> items;
     private Context context;
 
     public PatientAdapter(Context context, int textViewResourceId, ArrayList<Patient> items) {
         super(context, textViewResourceId, items);
-        this.items = items;
         this.context = context;
     }
 
@@ -31,7 +29,7 @@ public class PatientAdapter extends ArrayAdapter<Patient> {
             LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.patient_list_item, null);
         }
-        Patient p = items.get(position);
+        Patient p = getItem(position);
         if (p != null) {
         	
         	TextView textView = (TextView) v.findViewById(R.id.identifier_text);
