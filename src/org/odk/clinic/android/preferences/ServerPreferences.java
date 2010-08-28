@@ -15,7 +15,7 @@ public class ServerPreferences extends PreferenceActivity implements
 	public static String KEY_USERNAME = "username";
 	public static String KEY_PASSWORD = "password";
 	public static String KEY_COHORT = "cohort";
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,6 +26,7 @@ public class ServerPreferences extends PreferenceActivity implements
 		updateUsername();
 		updatePassword();
 		updateCohort();
+
 	}
 
 	@Override
@@ -77,7 +78,6 @@ public class ServerPreferences extends PreferenceActivity implements
 		EditTextPreference etp = (EditTextPreference) this
 				.getPreferenceScreen().findPreference(KEY_USERNAME);
 		etp.setSummary(etp.getText());
-
 	}
 
 	private void updatePassword() {

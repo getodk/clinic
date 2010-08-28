@@ -27,8 +27,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-//TODO: live search
-//TODO: fix search by patient id
 //TODO: download cohort list
 //TODO: multiple cohorts
 //TODO: error correction if connection fails
@@ -139,7 +137,7 @@ public class FindPatientActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_DOWNLOAD, 0, getString(R.string.download_patients))
-				.setIcon(R.drawable.ic_menu_invite);
+				.setIcon(R.drawable.ic_menu_refresh);
 		menu.add(0, MENU_PREFERENCES, 0, getString(R.string.server_preferences))
 				.setIcon(android.R.drawable.ic_menu_preferences);
 		return true;
