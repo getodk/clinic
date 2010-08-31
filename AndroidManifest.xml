@@ -26,6 +26,9 @@
 		<activity 
 			android:name=".preferences.ServerPreferences"
 			android:label="@string/app_name" />
+			<activity 
+			android:name=".activities.ShowPatientActivity"
+			android:label="@string/app_name" />
 			
 	</application>
 	

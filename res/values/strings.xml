@@ -34,6 +34,7 @@ the License.
 	<string name="error">Error: %s</string>
 	<string name="finding_patient">Finding patients...</string>
 	<string name="find_patient">List Patients</string>
+	<string name="show_patient">Show Patient</string>
 	<string name="info">ODK Clinic</string>
 	<string name="no_items">No patients found.</string>
 	<string name="odk">Open Data Kit</string>

@@ -47,7 +47,7 @@ public class FindPatientActivity extends ListActivity {
 	private EditText mSearchText;
 	private TextWatcher mFilterTextWatcher;
 
-	//private InputMethodManager mInputMethodManager;
+	// private InputMethodManager mInputMethodManager;
 
 	private ArrayAdapter<Patient> mPatientAdapter;
 	private ArrayList<Patient> mPatients = new ArrayList<Patient>();
@@ -67,7 +67,8 @@ public class FindPatientActivity extends ListActivity {
 				+ getString(R.string.find_patient));
 
 		// used to hide keyboard after search
-		//mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		// mInputMethodManager = (InputMethodManager)
+		// getSystemService(Context.INPUT_METHOD_SERVICE);
 
 		mFilterTextWatcher = new TextWatcher() {
 			@Override
@@ -75,18 +76,19 @@ public class FindPatientActivity extends ListActivity {
 					int count) {
 				mPatientAdapter.getFilter().filter(s);
 			}
+
 			@Override
 			public void afterTextChanged(Editable s) {
-				
+
 			}
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
-				
+
 			}
 		};
-		
+
 		mSearchText = (EditText) findViewById(R.id.search_text);
 		mSearchText.addTextChangedListener(mFilterTextWatcher);
 
@@ -105,7 +107,7 @@ public class FindPatientActivity extends ListActivity {
 				}
 			}
 		});
-		
+
 		if (savedInstanceState != null) {
 			if (savedInstanceState.containsKey(KEY_SEARCH)) {
 				getFoundPatients(savedInstanceState.getString(KEY_SEARCH));
@@ -131,6 +133,10 @@ public class FindPatientActivity extends ListActivity {
 				+ patientIdStr, Toast.LENGTH_SHORT);
 		t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
 		t.show();
+
+		Intent ip = new Intent(getApplicationContext(),
+				ShowPatientActivity.class);
+		startActivity(ip);
 	}
 
 	@Override
@@ -244,20 +250,16 @@ public class FindPatientActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		
+
 		mSearchText.removeTextChangedListener(mFilterTextWatcher);
 	}
 
 	@Override
 	protected void onResume() {
-/*
-		String s = mSearchText.getText().toString();
-		if (s != null && s.length() > 0) {
-			getFoundPatients(s);
-		} else {
-			getAllPatients();
-		}
-*/
+		/*
+		 * String s = mSearchText.getText().toString(); if (s != null &&
+		 * s.length() > 0) { getFoundPatients(s); } else { getAllPatients(); }
+		 */
 		super.onResume();
 	}
 
