@@ -1,5 +1,9 @@
 package org.odk.clinic.android.database;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
+import org.odk.clinic.android.openmrs.Obs;
 import org.odk.clinic.android.openmrs.Patient;
 
 import android.content.ContentValues;
@@ -23,7 +27,19 @@ public class PatientDbAdapter {
 	public static final String KEY_MIDDLE_NAME = "middlename";
 	public static final String KEY_BIRTHDATE = "birthdate";
 	public static final String KEY_GENDER = "gender";
+	
+	//obs fields
+	public static final String KEY_VALUE_TEXT = "value_text";
+	public static final String KEY_VALUE_NUMERIC = "value_numeric";
+	public static final String KEY_VALUE_DATE = "value_date";
+	public static final String KEY_VALUE_INT = "value_int";
+	public static final String KEY_FIELD_NAME = "field_name";
+	public static final String KEY_ENCOUNTER_DATE = "encounter_date";
+	
 
+	private DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private String mZeroDate = "0000-00-00 00:00:00";
+	
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 
@@ -34,10 +50,20 @@ public class PatientDbAdapter {
 			+ "familyname text, "
 			+ "middlename text, "
 			+ "birthdate text, " + "gender text);";
+	
+	private static final String SQL_CREATE_OBS_TABLE = "create table obs (_id integer primary key autoincrement, "
+		+ "patientid integer not null, "
+		+ "value_text text, "
+		+ "value_numeric double, "
+		+ "value_date datetime, "
+		+ "value_int integer, "
+		+ "field_name text not null, "
+		+ "encounter_date datetime not null);";
 
 	private static final String DATABASE_NAME = "patient";
 	private static final String DATABASE_TABLE = "patients";
-	private static final int DATABASE_VERSION = 1;
+	private static final String OBS_TABLE = "obs";
+	private static final int DATABASE_VERSION = 2;
 
 	private final Context mCtx;
 
@@ -50,12 +76,14 @@ public class PatientDbAdapter {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(DATABASE_CREATE);
+			db.execSQL(SQL_CREATE_OBS_TABLE);
 		}
 
 		@Override
 		// upgrading will destroy all old data
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			db.execSQL("DROP TABLE IF EXISTS patients");
+			db.execSQL("DROP TABLE IF EXISTS obs");
 			onCreate(db);
 		}
 	}
@@ -103,6 +131,31 @@ public class PatientDbAdapter {
 
 		return id;
 	}
+	
+	
+	public long createObs(Obs obs) {
+		ContentValues cv = new ContentValues();
+
+		cv.put(KEY_PATIENT_ID, obs.getPatientId());
+		cv.put(KEY_VALUE_TEXT, obs.getValueText());
+
+		cv.put(KEY_VALUE_NUMERIC, obs.getValueNumeric());
+		cv.put(KEY_VALUE_DATE, obs.getValueDate() != null ? mDateFormat.format(obs.getValueDate()) : mZeroDate);
+		cv.put(KEY_VALUE_INT, obs.getValueInt());
+
+		cv.put(KEY_FIELD_NAME, obs.getFieldName());
+		cv.put(KEY_ENCOUNTER_DATE, obs.getEncounterDate() != null ? mDateFormat.format(obs.getEncounterDate()) : mZeroDate);
+
+		long id = -1;
+		try {
+			id = mDb.insert(OBS_TABLE, null, cv);
+		} catch (SQLiteConstraintException e) {
+			Log.e(t, "Caught SQLiteConstraitException: " + e);
+		}
+
+		return id;
+	}
+	
 
 	/**
 	 * Remove all patients from the database.
@@ -110,6 +163,7 @@ public class PatientDbAdapter {
 	 * @return number of affected rows
 	 */
 	public boolean deleteAllPatients() {
+		mDb.delete(OBS_TABLE, null, null);
 		return mDb.delete(DATABASE_TABLE, null, null) > 0;
 	}
 

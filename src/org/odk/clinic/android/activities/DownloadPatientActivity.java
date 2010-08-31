@@ -2,10 +2,12 @@ package org.odk.clinic.android.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.database.PatientDbAdapter;
 import org.odk.clinic.android.listeners.DownloadPatientListener;
+import org.odk.clinic.android.openmrs.Obs;
 import org.odk.clinic.android.openmrs.Patient;
 import org.odk.clinic.android.openmrs.ServerConstants;
 import org.odk.clinic.android.preferences.ServerPreferences;
@@ -22,7 +24,7 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 public class DownloadPatientActivity extends Activity implements
-		DownloadPatientListener {
+DownloadPatientListener {
 
 	private final static int PROGRESS_DIALOG = 1;
 	private ProgressDialog mProgressDialog;
@@ -45,7 +47,7 @@ public class DownloadPatientActivity extends Activity implements
 			mDownloadPatientTask = new DownloadPatientTask();
 
 			SharedPreferences settings = PreferenceManager
-					.getDefaultSharedPreferences(getBaseContext());
+			.getDefaultSharedPreferences(getBaseContext());
 
 			String url = settings.getString(ServerPreferences.KEY_SERVER,
 					getString(R.string.default_server))
@@ -61,7 +63,7 @@ public class DownloadPatientActivity extends Activity implements
 
 			mDownloadPatientTask = new DownloadPatientTask();
 			mDownloadPatientTask
-					.setServerConnectionListener(DownloadPatientActivity.this);
+			.setServerConnectionListener(DownloadPatientActivity.this);
 			mDownloadPatientTask.execute(url, username, password, cohort);
 		}
 	}
@@ -105,7 +107,7 @@ public class DownloadPatientActivity extends Activity implements
 		} else {
 			@SuppressWarnings("unchecked")
 			ArrayList<Patient> foundPatients = (ArrayList<Patient>) result
-					.get(DownloadPatientTask.KEY_PATIENTS);
+			.get(DownloadPatientTask.KEY_PATIENTS);
 
 			if (foundPatients != null) {
 
@@ -117,6 +119,14 @@ public class DownloadPatientActivity extends Activity implements
 				for (Patient p : foundPatients) {
 					pda.createPatient(p);
 				}
+
+				List<Obs> obslist = (List<Obs>) result.get(DownloadPatientTask.KEY_MEDICAL_HISTOTY);
+				if(obslist != null){
+					for(Obs obs : obslist){
+						pda.createObs(obs);
+					}
+				}
+
 				pda.close();
 			}
 

@@ -9,9 +9,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import org.odk.clinic.android.listeners.DownloadPatientListener;
+import org.odk.clinic.android.openmrs.Obs;
 import org.odk.clinic.android.openmrs.Patient;
 import org.odk.clinic.android.openmrs.ServerConstants;
 
@@ -20,11 +22,12 @@ import android.os.AsyncTask;
 import com.jcraft.jzlib.ZInputStream;
 
 public class DownloadPatientTask extends
-		AsyncTask<String, String, HashMap<String, Object>> {
+AsyncTask<String, String, HashMap<String, Object>> {
 
 	DownloadPatientListener mStateListener;
 	public static final String KEY_ERROR = "error";
 	public static final String KEY_PATIENTS = "patients";
+	public static final String KEY_MEDICAL_HISTOTY = "medical_history";
 
 	int mAction = ServerConstants.ACTION_DOWNLOAD_PATIENTS;
 	String mSerializer = ServerConstants.DEFAULT_PATIENT_SERIALIZER;
@@ -49,6 +52,9 @@ public class DownloadPatientTask extends
 			if (zdis != null) {
 				patients = downloadPatients(zdis);
 				result.put(KEY_PATIENTS, patients);
+				result.put(KEY_MEDICAL_HISTOTY, downloadMedicalHistory(zdis));
+				
+				zdis.close();
 			}
 		} catch (Exception e) {
 			result.put(KEY_ERROR, e.getLocalizedMessage());
@@ -64,7 +70,7 @@ public class DownloadPatientTask extends
 			if (mStateListener != null) {
 				// update progress and total
 				mStateListener.progressUpdate(values[0], new Integer(values[1])
-						.intValue(), new Integer(values[2]).intValue());
+				.intValue(), new Integer(values[2]).intValue());
 			}
 		}
 
@@ -128,7 +134,7 @@ public class DownloadPatientTask extends
 		} else if (status == ServerConstants.STATUS_ACCESS_DENIED) {
 			zdis = null;
 			throw new IOException(
-					"Access denied. Check your username and password.");
+			"Access denied. Check your username and password.");
 		} else {
 			assert (status == ServerConstants.STATUS_SUCCESS); // success
 			return zdis;
@@ -136,7 +142,7 @@ public class DownloadPatientTask extends
 	}
 
 	private ArrayList<Patient> downloadPatients(DataInputStream zdis)
-			throws Exception {
+	throws Exception {
 
 		int c = zdis.readInt();
 
@@ -176,7 +182,69 @@ public class DownloadPatientTask extends
 			publishProgress(p.getPatientId().toString(), Integer.valueOf(i)
 					.toString(), Integer.valueOf(c).toString());
 		}
-		zdis.close();
+		
 		return patients;
+	}
+
+	private List<Obs> downloadMedicalHistory(DataInputStream zdis) throws Exception {
+
+		List<Obs> obslist = new ArrayList<Obs>();
+
+		//Patient table fields
+		int count = zdis.readInt();
+		for (int i = 0; i < count; i++) {
+			System.out.println("Field Id=" + zdis.readInt());
+			System.out.println("Field Name=" + zdis.readUTF());
+		}
+
+		//Patient table field values
+		count = zdis.readInt();
+		for (int i = 0; i < count; i++) {
+			System.out.println("Field Id=" + zdis.readInt());
+			System.out.println("Patient Id=" + zdis.readInt());
+			System.out.println("Value=" + zdis.readUTF());
+		}
+
+		//Patient medical history
+		count = zdis.readInt();
+		for (int i = 0; i < count; i++) 
+			downloadPatientMedicalHistory(obslist, zdis.readInt(), zdis);
+
+		return obslist;
+	}
+
+	
+	private static void downloadPatientMedicalHistory(List<Obs> obslist, int patientId, DataInputStream zdis) throws Exception {
+
+		int count = zdis.readInt();
+		for (int i = 0; i < count; i++) 		
+			downloadPatientMedicalHistoryFieldValues(obslist, patientId, zdis.readUTF(), zdis);
+	}
+	
+
+	private static void downloadPatientMedicalHistoryFieldValues(List<Obs> obslist, int patientId, String fieldName, DataInputStream zdis) throws Exception {
+
+		int count = zdis.readInt();
+
+		for (int i = 0; i < count; i++) {
+			Obs obs = new Obs();
+			obs.setPatientId(patientId);
+			obs.setFieldName(fieldName);
+
+			byte type = zdis.readByte();
+
+			if(type == 1)
+				obs.setValueText(zdis.readUTF());
+			else if(type == 2)
+				obs.setValueInt(zdis.readInt());
+			else if(type == 3)
+				obs.setValueNumeric(zdis.readFloat());
+			else if(type == 4)
+				obs.setValueDate(new Date(zdis.readLong()));
+
+			obs.setEncounterDate(new Date(zdis.readLong()));
+
+			obslist.add(obs);
+		}
 	}
 }
