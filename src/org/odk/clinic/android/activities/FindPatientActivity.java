@@ -33,12 +33,9 @@ import android.widget.Toast;
 //TODO: multiple cohorts
 //TODO: display patient view data
 //TODO: display ages instead of dates
-//TODO: filter does not work on refresh
 //TODO: after download obs, why so slow?
 
 public class FindPatientActivity extends ListActivity {
-
-	private static final String KEY_SEARCH = "search";
 
 	private static final int MENU_DOWNLOAD = Menu.FIRST;
 	private static final int MENU_PREFERENCES = MENU_DOWNLOAD + 1;
@@ -47,8 +44,6 @@ public class FindPatientActivity extends ListActivity {
 	private ImageButton mBarcodeButton;
 	private EditText mSearchText;
 	private TextWatcher mFilterTextWatcher;
-
-	// private InputMethodManager mInputMethodManager;
 
 	private ArrayAdapter<Patient> mPatientAdapter;
 	private ArrayList<Patient> mPatients = new ArrayList<Patient>();
@@ -66,10 +61,6 @@ public class FindPatientActivity extends ListActivity {
 		setContentView(R.layout.find_patient);
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.find_patient));
-
-		// used to hide keyboard after search
-		// mInputMethodManager = (InputMethodManager)
-		// getSystemService(Context.INPUT_METHOD_SERVICE);
 
 		mFilterTextWatcher = new TextWatcher() {
 			@Override
@@ -110,11 +101,6 @@ public class FindPatientActivity extends ListActivity {
 				}
 			}
 		});
-
-		if (savedInstanceState != null
-				&& savedInstanceState.containsKey(KEY_SEARCH)) {
-			mSearchText.setText(savedInstanceState.getString(KEY_SEARCH));
-		}
 
 	}
 
@@ -192,7 +178,7 @@ public class FindPatientActivity extends ListActivity {
 
 		PatientDbAdapter pda = new PatientDbAdapter(this);
 		DateFormat mdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		
+
 		pda.open();
 		Cursor c = null;
 		if (searchStr != null) {
@@ -227,7 +213,7 @@ public class FindPatientActivity extends ListActivity {
 					p.setIdentifier(c.getString(identifierIndex));
 					p.setGivenName(c.getString(givenNameIndex));
 					p.setFamilyName(c.getString(familyNameIndex));
-					p.setMiddleName(c.getString(middleNameIndex));					
+					p.setMiddleName(c.getString(middleNameIndex));
 					try {
 						p.setBirthDate(mdf.parse(c.getString(birthDateIndex)));
 					} catch (ParseException e) {
@@ -257,7 +243,6 @@ public class FindPatientActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
 		mSearchText.removeTextChangedListener(mFilterTextWatcher);
 
 	}
@@ -265,13 +250,9 @@ public class FindPatientActivity extends ListActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		String s = mSearchText.getText().toString();
-		if (s != null && s.length() > 0) {
-			getFoundPatients(s);
-		} else {
-			getAllPatients();
-		}
+		getAllPatients();
+		// hack to trigger refilter
+		mSearchText.setText(mSearchText.getText().toString());
 
 	}
 
@@ -284,7 +265,6 @@ public class FindPatientActivity extends ListActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString(KEY_SEARCH, mSearchText.getText().toString());
 	}
 
 }

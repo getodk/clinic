@@ -1,15 +1,14 @@
 package org.odk.clinic.android.activities;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.database.PatientDbAdapter;
 import org.odk.clinic.android.listeners.DownloadPatientListener;
+import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
-import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.preferences.ServerPreferences;
 import org.odk.clinic.android.tasks.DownloadPatientTask;
 
@@ -108,7 +107,7 @@ DownloadPatientListener {
 			t.show();
 		} else {
 			@SuppressWarnings("unchecked")
-			ArrayList<Patient> foundPatients = (ArrayList<Patient>) result
+			List<Patient> foundPatients = (List<Patient>) result
 			.get(DownloadPatientTask.KEY_PATIENTS);
 
 			if (foundPatients != null) {
@@ -122,10 +121,12 @@ DownloadPatientListener {
 					pda.createPatient(p);
 				}
 
-				List<Observation> obslist = (List<Observation>) result.get(DownloadPatientTask.KEY_OBSERVATIONS);
-				if(obslist != null){
-					for(Observation obs : obslist){
-						pda.createObservation(obs);
+				@SuppressWarnings("unchecked")
+				List<Observation> obs = (List<Observation>) result.get(DownloadPatientTask.KEY_OBSERVATIONS);
+				if(obs != null){
+					pda.deleteAllObservations();
+					for(Observation o : obs){
+						pda.createObservation(o);
 					}
 				}
 
@@ -141,12 +142,8 @@ DownloadPatientListener {
 	public void progressUpdate(String message, int progress, int max) {
 		mProgressDialog.setMax(max);
 		mProgressDialog.setProgress(progress);
-			
-			mProgressDialog.setTitle(getString(R.string.downloading,message));
-	
-
-		
-	}
+		mProgressDialog.setTitle(getString(R.string.downloading,message));
+		}
 
 	@Override
 	public Object onRetainNonConfigurationInstance() {

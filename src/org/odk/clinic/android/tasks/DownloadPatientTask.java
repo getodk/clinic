@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class DownloadPatientTask extends
 
 	@Override
 	protected HashMap<String, Object> doInBackground(String... values) {
-
+		
 		String url = values[0];
 		String username = values[1];
 		String password = values[2];
@@ -237,7 +236,7 @@ public class DownloadPatientTask extends
 				}
 			}
 			
-			publishProgress("observations", Integer.valueOf(i+icount)
+			publishProgress("history", Integer.valueOf(i+icount)
 					.toString(), Integer.valueOf(icount*2).toString());
 		}
 

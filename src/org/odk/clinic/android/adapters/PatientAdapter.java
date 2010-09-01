@@ -1,7 +1,7 @@
 package org.odk.clinic.android.adapters;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.openmrs.Patient;
@@ -20,7 +20,7 @@ public class PatientAdapter extends ArrayAdapter<Patient> {
 	private SimpleDateFormat mDateFormat = new SimpleDateFormat("MMM dd, yyyy");
 
 	public PatientAdapter(Context context, int textViewResourceId,
-			ArrayList<Patient> items) {
+			List<Patient> items) {
 		super(context, textViewResourceId, items);
 		this.context = context;
 	}
