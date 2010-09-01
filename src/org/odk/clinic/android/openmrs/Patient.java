@@ -1,5 +1,7 @@
 package org.odk.clinic.android.openmrs;
 
+import java.util.Date;
+
 public class Patient {
 
 	private Integer patientId = null;
@@ -9,7 +11,7 @@ public class Patient {
 	private String familyName = null;
 	private String middleName = null;
 	
-	private String birthDate = null;
+	private Date birthDate = null;
 	private String gender = null;
 	
 	public Patient() {
@@ -42,7 +44,7 @@ public class Patient {
 		return middleName;
 	}
 	
-	public String getBirthdate() {
+	public Date getBirthdate() {
 		return birthDate;
 	}
 	
@@ -70,7 +72,7 @@ public class Patient {
 		middleName = n;
 	}
 
-	public void setBirthdate(String b) {
+	public void setBirthDate(Date b) {
 		birthDate = b;
 	}
 

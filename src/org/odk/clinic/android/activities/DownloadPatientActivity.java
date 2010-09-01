@@ -86,6 +86,8 @@ DownloadPatientListener {
 			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			mProgressDialog.setIndeterminate(false);
 			mProgressDialog.setCancelable(false);
+			mProgressDialog.setMax(0);
+			mProgressDialog.setProgress(0);
 			mProgressDialog.setButton(getString(R.string.cancel),
 					loadingButtonListener);
 			return mProgressDialog;
@@ -123,7 +125,7 @@ DownloadPatientListener {
 				List<Observation> obslist = (List<Observation>) result.get(DownloadPatientTask.KEY_OBSERVATIONS);
 				if(obslist != null){
 					for(Observation obs : obslist){
-						pda.createObs(obs);
+						pda.createObservation(obs);
 					}
 				}
 

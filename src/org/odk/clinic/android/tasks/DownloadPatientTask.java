@@ -32,7 +32,6 @@ public class DownloadPatientTask extends
 	int mAction = Constants.ACTION_DOWNLOAD_PATIENTS;
 	String mSerializer = Constants.DEFAULT_PATIENT_SERIALIZER;
 	String mLocale = Locale.getDefault().getLanguage();
-	SimpleDateFormat mDateFormat = new SimpleDateFormat("MMM dd, yyyy");
 
 	@Override
 	protected HashMap<String, Object> doInBackground(String... values) {
@@ -143,14 +142,13 @@ public class DownloadPatientTask extends
 		int c = zdis.readInt();
 
 		List<Patient> patients = new ArrayList<Patient>(c);
-		for (int i = 0; i < c; i++) {
+		for (int i = 1; i < c + 1; i++) {
 			Patient p = new Patient();
 			if (zdis.readBoolean()) {
 				p.setPatientId(zdis.readInt());
 			}
 			if (zdis.readBoolean()) {
-				// ignore prefix
-				zdis.readUTF();
+				zdis.readUTF(); // ignore prefix
 			}
 			if (zdis.readBoolean()) {
 				p.setFamilyName(zdis.readUTF());
@@ -165,14 +163,13 @@ public class DownloadPatientTask extends
 				p.setGender(zdis.readUTF());
 			}
 			if (zdis.readBoolean()) {
-				p.setBirthdate(mDateFormat.format((new Date(zdis.readLong()))));
+				p.setBirthDate(new Date(zdis.readLong()));
 			}
 			if (zdis.readBoolean()) {
 				p.setIdentifier(zdis.readUTF());
 			}
 
-			// ignore new patient
-			zdis.readBoolean();
+			zdis.readBoolean(); // ignore new patient
 
 			patients.add(p);
 			publishProgress(p.getPatientId().toString(), Integer.valueOf(i)
@@ -190,41 +187,41 @@ public class DownloadPatientTask extends
 		// patient table fields
 		int count = zdis.readInt();
 		for (int i = 0; i < count; i++) {
-			zdis.readInt(); //field id
-			zdis.readUTF(); //field name
+			zdis.readInt(); // field id
+			zdis.readUTF(); // field name
 		}
 
 		// Patient table field values
 		count = zdis.readInt();
 		for (int i = 0; i < count; i++) {
-			zdis.readInt(); //field id
-			zdis.readInt(); //patient id
-			zdis.readUTF(); //value
+			zdis.readInt(); // field id
+			zdis.readInt(); // patient id
+			zdis.readUTF(); // value
 		}
 
 		// for every patient
 		int icount = zdis.readInt();
 		for (int i = 0; i < icount; i++) {
+			
+			// get patient id
+			int patientId = zdis.readInt();
 
 			// loop through list of obs
 			int jcount = zdis.readInt();
 			for (int j = 0; j < jcount; j++) {
 
+				// get field name
+				String fieldName = zdis.readUTF();
+				
 				// get ob values
-				int patientId = zdis.readInt();
 				int kcount = zdis.readInt();
 				for (int k = 0; k < kcount; k++) {
-
-					String fieldName = zdis.readUTF();
-
+					
 					Observation o = new Observation();
 					o.setPatientId(patientId);
 					o.setFieldName(fieldName);
 
-					System.out.println("Field Id=" + zdis.readInt());
-
-					byte type = zdis.readByte();
-
+					int type = zdis.readByte();
 					if (type == Constants.TYPE_STRING) {
 						o.setValueText(zdis.readUTF());
 					} else if (type == Constants.TYPE_INT) {
@@ -236,7 +233,6 @@ public class DownloadPatientTask extends
 					}
 
 					o.setEncounterDate(new Date(zdis.readLong()));
-
 					obs.add(o);
 				}
 			}

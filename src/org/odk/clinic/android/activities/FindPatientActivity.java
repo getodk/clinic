@@ -1,7 +1,9 @@
 package org.odk.clinic.android.activities;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.adapters.PatientAdapter;
@@ -32,10 +34,10 @@ import android.widget.Toast;
 //TODO: multiple cohorts
 //TODO: error correction if connection fails
 //TODO: display ages instead of dates
-//TODO: stronger typing of data in db
 //TODO: differential and faster download
 //TODO: more underlying data
 //TODO: logging stuff
+//TODO: filter does not work on refresh
 
 public class FindPatientActivity extends ListActivity {
 
@@ -75,7 +77,9 @@ public class FindPatientActivity extends ListActivity {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-				mPatientAdapter.getFilter().filter(s);
+				if (mPatientAdapter != null) {
+					mPatientAdapter.getFilter().filter(s);
+				}
 			}
 
 			@Override
@@ -109,13 +113,11 @@ public class FindPatientActivity extends ListActivity {
 			}
 		});
 
-		if (savedInstanceState != null) {
-			if (savedInstanceState.containsKey(KEY_SEARCH)) {
-				getFoundPatients(savedInstanceState.getString(KEY_SEARCH));
-			}
-		} else {
-			getAllPatients();
+		if (savedInstanceState != null
+				&& savedInstanceState.containsKey(KEY_SEARCH)) {
+			mSearchText.setText(savedInstanceState.getString(KEY_SEARCH));
 		}
+
 	}
 
 	@Override
@@ -191,6 +193,8 @@ public class FindPatientActivity extends ListActivity {
 	private void getFoundPatients(String searchStr) {
 
 		PatientDbAdapter pda = new PatientDbAdapter(this);
+		DateFormat mdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
 		pda.open();
 		Cursor c = null;
 		if (searchStr != null) {
@@ -213,8 +217,8 @@ public class FindPatientActivity extends ListActivity {
 					.getColumnIndex(PatientDbAdapter.KEY_FAMILY_NAME);
 			int middleNameIndex = c
 					.getColumnIndex(PatientDbAdapter.KEY_MIDDLE_NAME);
-			int birthdateIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_BIRTHDATE);
+			int birthDateIndex = c
+					.getColumnIndex(PatientDbAdapter.KEY_BIRTH_DATE);
 			int genderIndex = c.getColumnIndex(PatientDbAdapter.KEY_GENDER);
 
 			Patient p;
@@ -225,8 +229,12 @@ public class FindPatientActivity extends ListActivity {
 					p.setIdentifier(c.getString(identifierIndex));
 					p.setGivenName(c.getString(givenNameIndex));
 					p.setFamilyName(c.getString(familyNameIndex));
-					p.setMiddleName(c.getString(middleNameIndex));
-					p.setBirthdate(c.getString(birthdateIndex));
+					p.setMiddleName(c.getString(middleNameIndex));					
+					try {
+						p.setBirthDate(mdf.parse(c.getString(birthDateIndex)));
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
 					p.setGender(c.getString(genderIndex));
 					mPatients.add(p);
 				} while (c.moveToNext());
@@ -253,20 +261,26 @@ public class FindPatientActivity extends ListActivity {
 		super.onDestroy();
 
 		mSearchText.removeTextChangedListener(mFilterTextWatcher);
+
 	}
 
 	@Override
 	protected void onResume() {
-		/*
-		 * String s = mSearchText.getText().toString(); if (s != null &&
-		 * s.length() > 0) { getFoundPatients(s); } else { getAllPatients(); }
-		 */
 		super.onResume();
+
+		String s = mSearchText.getText().toString();
+		if (s != null && s.length() > 0) {
+			getFoundPatients(s);
+		} else {
+			getAllPatients();
+		}
+
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+
 	}
 
 	@Override

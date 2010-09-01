@@ -81,4 +81,9 @@ public class Constants {
 
 	
 
+	public static final int TYPE_STRING = 1;
+	public static final int TYPE_INT = 2;
+	public static final int TYPE_FLOAT = 3;
+	public static final int TYPE_DATE = 4;
+	
 }
