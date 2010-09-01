@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 //TODO: download cohort list
 //TODO: multiple cohorts
+//TODO: display patient view data
 //TODO: display ages instead of dates
 //TODO: filter does not work on refresh
 //TODO: after download obs, why so slow?
