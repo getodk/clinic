@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.adapters.PatientAdapter;
 import org.odk.clinic.android.database.PatientDbAdapter;
-import org.odk.clinic.android.logic.GlobalConstants;
 import org.odk.clinic.android.openmrs.Patient;
 import org.odk.clinic.android.preferences.ServerPreferences;
 
@@ -42,6 +41,7 @@ public class FindPatientActivity extends ListActivity {
 
 	private static final int MENU_DOWNLOAD = Menu.FIRST;
 	private static final int MENU_PREFERENCES = MENU_DOWNLOAD + 1;
+	public static final int BARCODE_CAPTURE = 2;
 
 	private ImageButton mBarcodeButton;
 	private EditText mSearchText;
@@ -99,7 +99,7 @@ public class FindPatientActivity extends ListActivity {
 			public void onClick(View v) {
 				Intent i = new Intent("com.google.zxing.client.android.SCAN");
 				try {
-					startActivityForResult(i, GlobalConstants.BARCODE_CAPTURE);
+					startActivityForResult(i, BARCODE_CAPTURE);
 				} catch (ActivityNotFoundException e) {
 					Toast t = Toast.makeText(getApplicationContext(),
 							getString(R.string.error, R.string.barcode_error),
@@ -173,7 +173,7 @@ public class FindPatientActivity extends ListActivity {
 			return;
 		}
 
-		if (requestCode == GlobalConstants.BARCODE_CAPTURE && intent != null) {
+		if (requestCode == BARCODE_CAPTURE && intent != null) {
 			String sb = intent.getStringExtra("SCAN_RESULT");
 			if (sb != null && sb.length() > 0) {
 				mSearchText.setText(sb);
