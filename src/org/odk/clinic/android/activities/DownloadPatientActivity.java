@@ -141,7 +141,11 @@ DownloadPatientListener {
 	public void progressUpdate(String message, int progress, int max) {
 		mProgressDialog.setMax(max);
 		mProgressDialog.setProgress(progress);
-		mProgressDialog.setTitle(getString(R.string.downloading_patients,message));
+			
+			mProgressDialog.setTitle(getString(R.string.downloading,message));
+	
+
+		
 	}
 
 	@Override

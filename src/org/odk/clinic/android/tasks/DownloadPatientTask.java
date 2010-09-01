@@ -48,7 +48,7 @@ public class DownloadPatientTask extends
 					cohort);
 			if (zdis != null) {
 				result.put(KEY_PATIENTS, downloadPatients(zdis));
-				result.put(KEY_OBSERVATIONS, downloadObsevations(zdis));
+				result.put(KEY_OBSERVATIONS, downloadObservations(zdis));
 				zdis.close();
 			}
 		} catch (Exception e) {
@@ -172,14 +172,14 @@ public class DownloadPatientTask extends
 			zdis.readBoolean(); // ignore new patient
 
 			patients.add(p);
-			publishProgress(p.getPatientId().toString(), Integer.valueOf(i)
-					.toString(), Integer.valueOf(c).toString());
+			publishProgress("patients", Integer.valueOf(i)
+					.toString(), Integer.valueOf(c*2).toString());
 		}
 
 		return patients;
 	}
 
-	private List<Observation> downloadObsevations(DataInputStream zdis)
+	private List<Observation> downloadObservations(DataInputStream zdis)
 			throws Exception {
 
 		List<Observation> obs = new ArrayList<Observation>();
@@ -201,7 +201,7 @@ public class DownloadPatientTask extends
 
 		// for every patient
 		int icount = zdis.readInt();
-		for (int i = 0; i < icount; i++) {
+		for (int i = 1; i < icount+1; i++) {
 			
 			// get patient id
 			int patientId = zdis.readInt();
@@ -236,6 +236,9 @@ public class DownloadPatientTask extends
 					obs.add(o);
 				}
 			}
+			
+			publishProgress("observations", Integer.valueOf(i+icount)
+					.toString(), Integer.valueOf(icount*2).toString());
 		}
 
 		return obs;
