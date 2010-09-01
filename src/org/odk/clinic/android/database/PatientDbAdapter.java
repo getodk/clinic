@@ -1,5 +1,6 @@
 package org.odk.clinic.android.database;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -12,7 +13,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 public class PatientDbAdapter {
@@ -42,10 +43,12 @@ public class PatientDbAdapter {
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 
-	private static final String DATABASE_NAME = "clinic";
+	private static final String DATABASE_NAME = "clinic.sqlite3";
 	private static final String PATIENTS_TABLE = "patients";
 	private static final String OBSERVATIONS_TABLE = "observations";
 	private static final int DATABASE_VERSION = 3;
+	 private static final String DATABASE_PATH =
+	        Environment.getExternalStorageDirectory() + "/clinic";
 
 	private static final String CREATE_PATIENTS_TABLE = "create table "+ PATIENTS_TABLE +" (_id integer primary key autoincrement, "
 		+ KEY_PATIENT_ID + " integer not null, "
@@ -66,13 +69,14 @@ public class PatientDbAdapter {
 		+ KEY_FIELD_NAME + " text not null, "
 		+ KEY_ENCOUNTER_DATE + " datetime not null);";
 
-	private final Context mCtx;
+	private static class DatabaseHelper extends ODKSQLiteOpenHelper {
 
-	private static class DatabaseHelper extends SQLiteOpenHelper {
+		DatabaseHelper() {
+			super(DATABASE_PATH, DATABASE_NAME, null, DATABASE_VERSION);
 
-		DatabaseHelper(Context context) {
-			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		}
+            // Create database storage directory if it doesn't not already exist.
+            File f = new File(DATABASE_PATH);
+            f.mkdirs();		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
@@ -89,12 +93,8 @@ public class PatientDbAdapter {
 		}
 	}
 
-	public PatientDbAdapter(Context ctx) {
-		this.mCtx = ctx;
-	}
-
 	public PatientDbAdapter open() throws SQLException {
-		mDbHelper = new DatabaseHelper(mCtx);
+		mDbHelper = new DatabaseHelper();
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}

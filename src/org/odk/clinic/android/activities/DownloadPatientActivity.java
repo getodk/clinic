@@ -22,8 +22,10 @@ import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.widget.Toast;
 
+// todo move inserts into task
+
 public class DownloadPatientActivity extends Activity implements
-DownloadPatientListener {
+		DownloadPatientListener {
 
 	private final static int PROGRESS_DIALOG = 1;
 	private ProgressDialog mProgressDialog;
@@ -46,7 +48,7 @@ DownloadPatientListener {
 			mDownloadPatientTask = new DownloadPatientTask();
 
 			SharedPreferences settings = PreferenceManager
-			.getDefaultSharedPreferences(getBaseContext());
+					.getDefaultSharedPreferences(getBaseContext());
 
 			String url = settings.getString(ServerPreferences.KEY_SERVER,
 					getString(R.string.default_server))
@@ -62,7 +64,7 @@ DownloadPatientListener {
 
 			mDownloadPatientTask = new DownloadPatientTask();
 			mDownloadPatientTask
-			.setServerConnectionListener(DownloadPatientActivity.this);
+					.setServerConnectionListener(DownloadPatientActivity.this);
 			mDownloadPatientTask.execute(url, username, password, cohort);
 		}
 	}
@@ -95,46 +97,16 @@ DownloadPatientListener {
 		return null;
 	}
 
-	public void downloadComplete(HashMap<String, Object> result) {
+	public void downloadComplete(String result) {
 
 		dismissDialog(PROGRESS_DIALOG);
-
-		if (result.containsKey(DownloadPatientTask.KEY_ERROR)) {
-			String error = (String) result.get(DownloadPatientTask.KEY_ERROR);
+		if (result != null) {
 			Toast t = Toast.makeText(getApplicationContext(),
-					getString(R.string.error, error), Toast.LENGTH_LONG);
+					getString(R.string.error, result), Toast.LENGTH_LONG);
 			t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
 			t.show();
-		} else {
-			@SuppressWarnings("unchecked")
-			List<Patient> foundPatients = (List<Patient>) result
-			.get(DownloadPatientTask.KEY_PATIENTS);
-
-			if (foundPatients != null) {
-
-				// Update patient database
-				PatientDbAdapter pda = new PatientDbAdapter(this);
-				pda.open();
-				// Clear all previous patient entries
-				pda.deleteAllPatients();
-				for (Patient p : foundPatients) {
-					pda.createPatient(p);
-				}
-
-				@SuppressWarnings("unchecked")
-				List<Observation> obs = (List<Observation>) result.get(DownloadPatientTask.KEY_OBSERVATIONS);
-				if(obs != null){
-					pda.deleteAllObservations();
-					for(Observation o : obs){
-						pda.createObservation(o);
-					}
-				}
-
-				pda.close();
-			}
-
 		}
-
+		
 		finish();
 	}
 
@@ -142,8 +114,8 @@ DownloadPatientListener {
 	public void progressUpdate(String message, int progress, int max) {
 		mProgressDialog.setMax(max);
 		mProgressDialog.setProgress(progress);
-		mProgressDialog.setTitle(getString(R.string.downloading,message));
-		}
+		mProgressDialog.setTitle(getString(R.string.downloading, message));
+	}
 
 	@Override
 	public Object onRetainNonConfigurationInstance() {

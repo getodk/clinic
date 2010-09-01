@@ -5,12 +5,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
+import org.odk.clinic.android.database.PatientDbAdapter;
 import org.odk.clinic.android.listeners.DownloadPatientListener;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Observation;
@@ -20,10 +19,8 @@ import android.os.AsyncTask;
 
 import com.jcraft.jzlib.ZInputStream;
 
-//TODO: too many objects being created. make this go faster.
-
 public class DownloadPatientTask extends
-		AsyncTask<String, String, HashMap<String, Object>> {
+		AsyncTask<String, String, String> {
 
 	DownloadPatientListener mStateListener;
 	public static final String KEY_ERROR = "error";
@@ -33,31 +30,41 @@ public class DownloadPatientTask extends
 	int mAction = Constants.ACTION_DOWNLOAD_PATIENTS;
 	String mSerializer = Constants.DEFAULT_PATIENT_SERIALIZER;
 	String mLocale = Locale.getDefault().getLanguage();
+	
+	PatientDbAdapter mPatientDbAdapter = new PatientDbAdapter();
 
 	@Override
-	protected HashMap<String, Object> doInBackground(String... values) {
+	protected String doInBackground(String... values) {
 
 		String url = values[0];
 		String username = values[1];
 		String password = values[2];
 		int cohort = Integer.valueOf(values[3]).intValue();
 
-		HashMap<String, Object> result = new HashMap<String, Object>();
 
 		try {
 			DataInputStream zdis = connectToServer(url, username, password,
 					cohort);
 			if (zdis != null) {
-				result.put(KEY_PATIENTS, downloadPatients(zdis));
-				result.put(KEY_OBSERVATIONS, downloadObservations(zdis));
+				// open db and clean entries
+				mPatientDbAdapter.open();
+				mPatientDbAdapter.deleteAllPatients();
+				mPatientDbAdapter.deleteAllObservations();
+				
+				// download and insert patients and obs
+				insertPatients(zdis);
+				insertObservations(zdis);
+				
+				// close db and stream
+				mPatientDbAdapter.close();
 				zdis.close();
 			}
 		} catch (Exception e) {
-			result.put(KEY_ERROR, e.getLocalizedMessage());
 			e.printStackTrace();
+			return e.getLocalizedMessage();
 		}
 
-		return result;
+		return null;
 	}
 
 	@Override
@@ -73,7 +80,7 @@ public class DownloadPatientTask extends
 	}
 
 	@Override
-	protected void onPostExecute(HashMap<String, Object> result) {
+	protected void onPostExecute(String result) {
 		synchronized (this) {
 			if (mStateListener != null)
 				mStateListener.downloadComplete(result);
@@ -138,12 +145,12 @@ public class DownloadPatientTask extends
 		}
 	}
 
-	private List<Patient> downloadPatients(DataInputStream zdis)
+	private void insertPatients(DataInputStream zdis)
 			throws Exception {
 
 		int c = zdis.readInt();
 
-		List<Patient> patients = new ArrayList<Patient>(c);
+		//List<Patient> patients = new ArrayList<Patient>(c);
 		for (int i = 1; i < c + 1; i++) {
 			Patient p = new Patient();
 			if (zdis.readBoolean()) {
@@ -173,18 +180,16 @@ public class DownloadPatientTask extends
 
 			zdis.readBoolean(); // ignore new patient
 
-			patients.add(p);
+			mPatientDbAdapter.createPatient(p);
+
 			publishProgress("patients", Integer.valueOf(i).toString(), Integer
 					.valueOf(c * 2).toString());
 		}
 
-		return patients;
 	}
 
-	private List<Observation> downloadObservations(DataInputStream zdis)
+	private void insertObservations(DataInputStream zdis)
 			throws Exception {
-
-		List<Observation> obs = new ArrayList<Observation>();
 
 		// patient table fields
 		int count = zdis.readInt();
@@ -235,7 +240,7 @@ public class DownloadPatientTask extends
 					}
 
 					o.setEncounterDate(new Date(zdis.readLong()));
-					obs.add(o);
+					mPatientDbAdapter.createObservation(o);
 				}
 			}
 
@@ -243,6 +248,7 @@ public class DownloadPatientTask extends
 					Integer.valueOf(icount * 2).toString());
 		}
 
-		return obs;
 	}
+	
 }
+

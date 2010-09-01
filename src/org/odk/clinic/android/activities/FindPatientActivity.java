@@ -176,7 +176,7 @@ public class FindPatientActivity extends ListActivity {
 
 	private void getFoundPatients(String searchStr) {
 
-		PatientDbAdapter pda = new PatientDbAdapter(this);
+		PatientDbAdapter pda = new PatientDbAdapter();
 		DateFormat mdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		pda.open();
