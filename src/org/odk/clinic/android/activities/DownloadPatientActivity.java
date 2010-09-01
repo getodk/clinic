@@ -7,9 +7,9 @@ import java.util.List;
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.database.PatientDbAdapter;
 import org.odk.clinic.android.listeners.DownloadPatientListener;
-import org.odk.clinic.android.openmrs.Obs;
+import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
-import org.odk.clinic.android.openmrs.ServerConstants;
+import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.preferences.ServerPreferences;
 import org.odk.clinic.android.tasks.DownloadPatientTask;
 
@@ -51,7 +51,7 @@ DownloadPatientListener {
 
 			String url = settings.getString(ServerPreferences.KEY_SERVER,
 					getString(R.string.default_server))
-					+ ServerConstants.USER_DOWNLOAD_URL;
+					+ Constants.USER_DOWNLOAD_URL;
 			String username = settings.getString(
 					ServerPreferences.KEY_USERNAME,
 					getString(R.string.default_username));
@@ -120,9 +120,9 @@ DownloadPatientListener {
 					pda.createPatient(p);
 				}
 
-				List<Obs> obslist = (List<Obs>) result.get(DownloadPatientTask.KEY_MEDICAL_HISTOTY);
+				List<Observation> obslist = (List<Observation>) result.get(DownloadPatientTask.KEY_OBSERVATIONS);
 				if(obslist != null){
-					for(Obs obs : obslist){
+					for(Observation obs : obslist){
 						pda.createObs(obs);
 					}
 				}

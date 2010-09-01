@@ -13,27 +13,26 @@ import java.util.List;
 import java.util.Locale;
 
 import org.odk.clinic.android.listeners.DownloadPatientListener;
-import org.odk.clinic.android.openmrs.Obs;
+import org.odk.clinic.android.openmrs.Constants;
+import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
-import org.odk.clinic.android.openmrs.ServerConstants;
 
 import android.os.AsyncTask;
 
 import com.jcraft.jzlib.ZInputStream;
 
 public class DownloadPatientTask extends
-AsyncTask<String, String, HashMap<String, Object>> {
+		AsyncTask<String, String, HashMap<String, Object>> {
 
 	DownloadPatientListener mStateListener;
 	public static final String KEY_ERROR = "error";
 	public static final String KEY_PATIENTS = "patients";
-	public static final String KEY_MEDICAL_HISTOTY = "medical_history";
+	public static final String KEY_OBSERVATIONS = "observations";
 
-	int mAction = ServerConstants.ACTION_DOWNLOAD_PATIENTS;
-	String mSerializer = ServerConstants.DEFAULT_PATIENT_SERIALIZER;
+	int mAction = Constants.ACTION_DOWNLOAD_PATIENTS;
+	String mSerializer = Constants.DEFAULT_PATIENT_SERIALIZER;
 	String mLocale = Locale.getDefault().getLanguage();
 	SimpleDateFormat mDateFormat = new SimpleDateFormat("MMM dd, yyyy");
-	ArrayList<Patient> mPatients = null;
 
 	@Override
 	protected HashMap<String, Object> doInBackground(String... values) {
@@ -45,15 +44,12 @@ AsyncTask<String, String, HashMap<String, Object>> {
 
 		HashMap<String, Object> result = new HashMap<String, Object>();
 
-		ArrayList<Patient> patients = null;
 		try {
 			DataInputStream zdis = connectToServer(url, username, password,
 					cohort);
 			if (zdis != null) {
-				patients = downloadPatients(zdis);
-				result.put(KEY_PATIENTS, patients);
-				result.put(KEY_MEDICAL_HISTOTY, downloadMedicalHistory(zdis));
-				
+				result.put(KEY_PATIENTS, downloadPatients(zdis));
+				result.put(KEY_OBSERVATIONS, downloadObsevations(zdis));
 				zdis.close();
 			}
 		} catch (Exception e) {
@@ -70,7 +66,7 @@ AsyncTask<String, String, HashMap<String, Object>> {
 			if (mStateListener != null) {
 				// update progress and total
 				mStateListener.progressUpdate(values[0], new Integer(values[1])
-				.intValue(), new Integer(values[2]).intValue());
+						.intValue(), new Integer(values[2]).intValue());
 			}
 		}
 
@@ -114,7 +110,7 @@ AsyncTask<String, String, HashMap<String, Object>> {
 		dos.writeUTF(mLocale); // locale
 		dos.writeByte(Integer.valueOf(mAction).byteValue());
 
-		if (mAction == ServerConstants.ACTION_DOWNLOAD_PATIENTS && cohort > 0) {
+		if (mAction == Constants.ACTION_DOWNLOAD_PATIENTS && cohort > 0) {
 			dos.writeInt(cohort);
 		}
 
@@ -128,25 +124,25 @@ AsyncTask<String, String, HashMap<String, Object>> {
 
 		int status = zdis.readByte();
 
-		if (status == ServerConstants.STATUS_FAILURE) {
+		if (status == Constants.STATUS_FAILURE) {
 			zdis = null;
 			throw new IOException("Connection failed. Please try again.");
-		} else if (status == ServerConstants.STATUS_ACCESS_DENIED) {
+		} else if (status == Constants.STATUS_ACCESS_DENIED) {
 			zdis = null;
 			throw new IOException(
-			"Access denied. Check your username and password.");
+					"Access denied. Check your username and password.");
 		} else {
-			assert (status == ServerConstants.STATUS_SUCCESS); // success
+			assert (status == Constants.STATUS_SUCCESS); // success
 			return zdis;
 		}
 	}
 
-	private ArrayList<Patient> downloadPatients(DataInputStream zdis)
-	throws Exception {
+	private List<Patient> downloadPatients(DataInputStream zdis)
+			throws Exception {
 
 		int c = zdis.readInt();
 
-		ArrayList<Patient> patients = new ArrayList<Patient>(c);
+		List<Patient> patients = new ArrayList<Patient>(c);
 		for (int i = 0; i < c; i++) {
 			Patient p = new Patient();
 			if (zdis.readBoolean()) {
@@ -182,69 +178,70 @@ AsyncTask<String, String, HashMap<String, Object>> {
 			publishProgress(p.getPatientId().toString(), Integer.valueOf(i)
 					.toString(), Integer.valueOf(c).toString());
 		}
-		
+
 		return patients;
 	}
 
-	private List<Obs> downloadMedicalHistory(DataInputStream zdis) throws Exception {
+	private List<Observation> downloadObsevations(DataInputStream zdis)
+			throws Exception {
 
-		List<Obs> obslist = new ArrayList<Obs>();
+		List<Observation> obs = new ArrayList<Observation>();
 
-		//Patient table fields
+		// patient table fields
 		int count = zdis.readInt();
 		for (int i = 0; i < count; i++) {
-			System.out.println("Field Id=" + zdis.readInt());
-			System.out.println("Field Name=" + zdis.readUTF());
+			zdis.readInt(); //field id
+			zdis.readUTF(); //field name
 		}
 
-		//Patient table field values
+		// Patient table field values
 		count = zdis.readInt();
 		for (int i = 0; i < count; i++) {
-			System.out.println("Field Id=" + zdis.readInt());
-			System.out.println("Patient Id=" + zdis.readInt());
-			System.out.println("Value=" + zdis.readUTF());
+			zdis.readInt(); //field id
+			zdis.readInt(); //patient id
+			zdis.readUTF(); //value
 		}
 
-		//Patient medical history
-		count = zdis.readInt();
-		for (int i = 0; i < count; i++) 
-			downloadPatientMedicalHistory(obslist, zdis.readInt(), zdis);
+		// for every patient
+		int icount = zdis.readInt();
+		for (int i = 0; i < icount; i++) {
 
-		return obslist;
-	}
+			// loop through list of obs
+			int jcount = zdis.readInt();
+			for (int j = 0; j < jcount; j++) {
 
-	
-	private static void downloadPatientMedicalHistory(List<Obs> obslist, int patientId, DataInputStream zdis) throws Exception {
+				// get ob values
+				int patientId = zdis.readInt();
+				int kcount = zdis.readInt();
+				for (int k = 0; k < kcount; k++) {
 
-		int count = zdis.readInt();
-		for (int i = 0; i < count; i++) 		
-			downloadPatientMedicalHistoryFieldValues(obslist, patientId, zdis.readUTF(), zdis);
-	}
-	
+					String fieldName = zdis.readUTF();
 
-	private static void downloadPatientMedicalHistoryFieldValues(List<Obs> obslist, int patientId, String fieldName, DataInputStream zdis) throws Exception {
+					Observation o = new Observation();
+					o.setPatientId(patientId);
+					o.setFieldName(fieldName);
 
-		int count = zdis.readInt();
+					System.out.println("Field Id=" + zdis.readInt());
 
-		for (int i = 0; i < count; i++) {
-			Obs obs = new Obs();
-			obs.setPatientId(patientId);
-			obs.setFieldName(fieldName);
+					byte type = zdis.readByte();
 
-			byte type = zdis.readByte();
+					if (type == Constants.TYPE_STRING) {
+						o.setValueText(zdis.readUTF());
+					} else if (type == Constants.TYPE_INT) {
+						o.setValueInt(zdis.readInt());
+					} else if (type == Constants.TYPE_FLOAT) {
+						o.setValueNumeric(zdis.readFloat());
+					} else if (type == Constants.TYPE_DATE) {
+						o.setValueDate(new Date(zdis.readLong()));
+					}
 
-			if(type == 1)
-				obs.setValueText(zdis.readUTF());
-			else if(type == 2)
-				obs.setValueInt(zdis.readInt());
-			else if(type == 3)
-				obs.setValueNumeric(zdis.readFloat());
-			else if(type == 4)
-				obs.setValueDate(new Date(zdis.readLong()));
+					o.setEncounterDate(new Date(zdis.readLong()));
 
-			obs.setEncounterDate(new Date(zdis.readLong()));
-
-			obslist.add(obs);
+					obs.add(o);
+				}
+			}
 		}
+
+		return obs;
 	}
 }

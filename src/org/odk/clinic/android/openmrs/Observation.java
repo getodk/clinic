@@ -2,7 +2,7 @@ package org.odk.clinic.android.openmrs;
 
 import java.util.Date;
 
-public class Obs {
+public class Observation {
 
 	private Integer patientId = null;
 	private Float valueNumeric;

@@ -23,7 +23,7 @@ package org.odk.clinic.android.openmrs;
  * @author @author Yaw Anokwa (yanokwa@gmail.com)
  * 
  */
-public class ServerConstants {
+public class Constants {
 
 	/** Value representing a not yet set status. */
 	public static final int STATUS_NULL = -1;

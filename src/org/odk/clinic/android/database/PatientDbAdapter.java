@@ -3,7 +3,7 @@ package org.odk.clinic.android.database;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import org.odk.clinic.android.openmrs.Obs;
+import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
 
 import android.content.ContentValues;
@@ -20,12 +20,12 @@ public class PatientDbAdapter {
 
 	// database columns
 	public static final String KEY_ID = "_id";
-	public static final String KEY_PATIENT_ID = "patientid";
+	public static final String KEY_PATIENT_ID = "patient_id";
 	public static final String KEY_IDENTIFIER = "identifier";
-	public static final String KEY_GIVEN_NAME = "givenname";
-	public static final String KEY_FAMILY_NAME = "familyname";
-	public static final String KEY_MIDDLE_NAME = "middlename";
-	public static final String KEY_BIRTHDATE = "birthdate";
+	public static final String KEY_GIVEN_NAME = "given_name";
+	public static final String KEY_FAMILY_NAME = "family_name";
+	public static final String KEY_MIDDLE_NAME = "middle_name";
+	public static final String KEY_BIRTHDATE = "birth_date";
 	public static final String KEY_GENDER = "gender";
 	
 	//obs fields
@@ -133,7 +133,7 @@ public class PatientDbAdapter {
 	}
 	
 	
-	public long createObs(Obs obs) {
+	public long createObs(Observation obs) {
 		ContentValues cv = new ContentValues();
 
 		cv.put(KEY_PATIENT_ID, obs.getPatientId());

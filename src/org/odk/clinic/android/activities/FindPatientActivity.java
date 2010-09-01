@@ -1,6 +1,7 @@
 package org.odk.clinic.android.activities;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.adapters.PatientAdapter;
