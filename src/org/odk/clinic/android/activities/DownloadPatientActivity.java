@@ -1,6 +1,7 @@
 package org.odk.clinic.android.activities;
 
 import org.odk.clinic.android.R;
+import org.odk.clinic.android.database.PatientDbAdapter;
 import org.odk.clinic.android.listeners.DownloadPatientListener;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.preferences.ServerPreferences;
@@ -33,6 +34,16 @@ public class DownloadPatientActivity extends Activity implements
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.download_patients));
 
+		if (!PatientDbAdapter.storageReady()) {
+			Toast t = Toast.makeText(getApplicationContext(),
+					getString(R.string.error, R.string.storage_error),
+					Toast.LENGTH_LONG);
+			t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+			t.show();
+			finish();
+		}
+
+		
 		// get the task if we've changed orientations. If it's null it's a new
 		// upload.
 		mDownloadPatientTask = (DownloadPatientTask) getLastNonConfigurationInstance();

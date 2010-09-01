@@ -27,7 +27,7 @@ public class PatientDbAdapter {
 	public static final String KEY_MIDDLE_NAME = "middle_name";
 	public static final String KEY_BIRTH_DATE = "birth_date";
 	public static final String KEY_GENDER = "gender";
-	
+
 	// observation columns
 	public static final String KEY_VALUE_TEXT = "value_text";
 	public static final String KEY_VALUE_NUMERIC = "value_numeric";
@@ -35,10 +35,10 @@ public class PatientDbAdapter {
 	public static final String KEY_VALUE_INT = "value_int";
 	public static final String KEY_FIELD_NAME = "field_name";
 	public static final String KEY_ENCOUNTER_DATE = "encounter_date";
-	
+
 	private DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private String mZeroDate = "0000-00-00 00:00:00";
-	
+
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 
@@ -46,37 +46,29 @@ public class PatientDbAdapter {
 	private static final String PATIENTS_TABLE = "patients";
 	private static final String OBSERVATIONS_TABLE = "observations";
 	private static final int DATABASE_VERSION = 4;
-	 private static final String DATABASE_PATH =
-	        Environment.getExternalStorageDirectory() + "/clinic";
+	private static final String DATABASE_PATH = Environment
+			.getExternalStorageDirectory() + "/clinic";
 
-	private static final String CREATE_PATIENTS_TABLE = "create table "+ PATIENTS_TABLE +" (_id integer primary key autoincrement, "
-		+ KEY_PATIENT_ID + " integer not null, "
-		+ KEY_IDENTIFIER + " text, "
-		+ KEY_GIVEN_NAME + " text, "
-		+ KEY_FAMILY_NAME + " text, "
-		+ KEY_MIDDLE_NAME + " text, "
-		+ KEY_BIRTH_DATE + " datetime, "
-		+ KEY_GENDER + " text);";
+	private static final String CREATE_PATIENTS_TABLE = "create table "
+			+ PATIENTS_TABLE + " (_id integer primary key autoincrement, "
+			+ KEY_PATIENT_ID + " integer not null, " + KEY_IDENTIFIER
+			+ " text, " + KEY_GIVEN_NAME + " text, " + KEY_FAMILY_NAME
+			+ " text, " + KEY_MIDDLE_NAME + " text, " + KEY_BIRTH_DATE
+			+ " datetime, " + KEY_GENDER + " text);";
 
-	
-	private static final String CREATE_OBSERVATIONS_TABLE = "create table "+ OBSERVATIONS_TABLE +" (_id integer primary key autoincrement, "
-		+ KEY_PATIENT_ID + " integer not null, "
-		+ KEY_VALUE_TEXT + " text, "
-		+ KEY_VALUE_NUMERIC + " double, "
-		+ KEY_VALUE_DATE + " datetime, "
-		+ KEY_VALUE_INT + " integer, "
-		+ KEY_FIELD_NAME + " text not null, "
-		+ KEY_ENCOUNTER_DATE + " datetime not null);";
+	private static final String CREATE_OBSERVATIONS_TABLE = "create table "
+			+ OBSERVATIONS_TABLE + " (_id integer primary key autoincrement, "
+			+ KEY_PATIENT_ID + " integer not null, " + KEY_VALUE_TEXT
+			+ " text, " + KEY_VALUE_NUMERIC + " double, " + KEY_VALUE_DATE
+			+ " datetime, " + KEY_VALUE_INT + " integer, " + KEY_FIELD_NAME
+			+ " text not null, " + KEY_ENCOUNTER_DATE + " datetime not null);";
 
 	private static class DatabaseHelper extends ODKSQLiteOpenHelper {
 
 		DatabaseHelper() {
 			super(DATABASE_PATH, DATABASE_NAME, null, DATABASE_VERSION);
-
-            // create database storage directory if it doesn't not already exist.
-            File f = new File(DATABASE_PATH);
-            f.mkdirs();		
-       }
+			createStorage();
+		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
@@ -87,8 +79,8 @@ public class PatientDbAdapter {
 		@Override
 		// upgrading will destroy all old data
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			db.execSQL("DROP TABLE IF EXISTS "+PATIENTS_TABLE);
-			db.execSQL("DROP TABLE IF EXISTS "+OBSERVATIONS_TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + PATIENTS_TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + OBSERVATIONS_TABLE);
 			onCreate(db);
 		}
 	}
@@ -120,7 +112,9 @@ public class PatientDbAdapter {
 		cv.put(KEY_FAMILY_NAME, patient.getFamilyName());
 		cv.put(KEY_MIDDLE_NAME, patient.getMiddleName());
 
-		cv.put(KEY_BIRTH_DATE, patient.getBirthdate() != null ? mDateFormat.format(patient.getBirthdate()) : mZeroDate);
+		cv.put(KEY_BIRTH_DATE,
+				patient.getBirthdate() != null ? mDateFormat.format(patient
+						.getBirthdate()) : mZeroDate);
 		cv.put(KEY_GENDER, patient.getGender());
 
 		long id = -1;
@@ -132,8 +126,7 @@ public class PatientDbAdapter {
 
 		return id;
 	}
-	
-	
+
 	public long createObservation(Observation obs) {
 		ContentValues cv = new ContentValues();
 
@@ -141,11 +134,15 @@ public class PatientDbAdapter {
 		cv.put(KEY_VALUE_TEXT, obs.getValueText());
 
 		cv.put(KEY_VALUE_NUMERIC, obs.getValueNumeric());
-		cv.put(KEY_VALUE_DATE, obs.getValueDate() != null ? mDateFormat.format(obs.getValueDate()) : mZeroDate);
+		cv.put(KEY_VALUE_DATE,
+				obs.getValueDate() != null ? mDateFormat.format(obs
+						.getValueDate()) : mZeroDate);
 		cv.put(KEY_VALUE_INT, obs.getValueInt());
 
 		cv.put(KEY_FIELD_NAME, obs.getFieldName());
-		cv.put(KEY_ENCOUNTER_DATE, obs.getEncounterDate() != null ? mDateFormat.format(obs.getEncounterDate()) : mZeroDate);
+		cv.put(KEY_ENCOUNTER_DATE,
+				obs.getEncounterDate() != null ? mDateFormat.format(obs
+						.getEncounterDate()) : mZeroDate);
 
 		long id = -1;
 		try {
@@ -156,7 +153,6 @@ public class PatientDbAdapter {
 
 		return id;
 	}
-	
 
 	/**
 	 * Remove all patients from the database.
@@ -166,11 +162,10 @@ public class PatientDbAdapter {
 	public boolean deleteAllPatients() {
 		return mDb.delete(PATIENTS_TABLE, null, null) > 0;
 	}
-	
-	public boolean deleteAllObservations() {
-		return mDb.delete(OBSERVATIONS_TABLE, null, null) >0;
-	}
 
+	public boolean deleteAllObservations() {
+		return mDb.delete(OBSERVATIONS_TABLE, null, null) > 0;
+	}
 
 	/**
 	 * Get a cursor to multiple patients from the database.
@@ -212,11 +207,10 @@ public class PatientDbAdapter {
 				}
 			}
 
-			c = mDb.query(true, PATIENTS_TABLE,
-					new String[] { KEY_ID, KEY_PATIENT_ID, KEY_IDENTIFIER,
-							KEY_GIVEN_NAME, KEY_FAMILY_NAME, KEY_MIDDLE_NAME,
-							KEY_BIRTH_DATE, KEY_GENDER }, expr.toString(), null,
-					null, null, null, null);
+			c = mDb.query(true, PATIENTS_TABLE, new String[] { KEY_ID,
+					KEY_PATIENT_ID, KEY_IDENTIFIER, KEY_GIVEN_NAME,
+					KEY_FAMILY_NAME, KEY_MIDDLE_NAME, KEY_BIRTH_DATE,
+					KEY_GENDER }, expr.toString(), null, null, null, null, null);
 		} else if (identifier != null) {
 			// search using identifier
 
@@ -225,12 +219,11 @@ public class PatientDbAdapter {
 			identifier = identifier.replaceAll("%", "^%");
 			identifier = identifier.replaceAll("_", "^_");
 
-			c = mDb.query(true, PATIENTS_TABLE,
-					new String[] { KEY_ID, KEY_PATIENT_ID, KEY_IDENTIFIER,
-							KEY_GIVEN_NAME, KEY_FAMILY_NAME, KEY_MIDDLE_NAME,
-							KEY_BIRTH_DATE, KEY_GENDER }, KEY_IDENTIFIER
-							+ " LIKE '" + identifier + "%' ESCAPE '^'", null,
-					null, null, null, null);
+			c = mDb.query(true, PATIENTS_TABLE, new String[] { KEY_ID,
+					KEY_PATIENT_ID, KEY_IDENTIFIER, KEY_GIVEN_NAME,
+					KEY_FAMILY_NAME, KEY_MIDDLE_NAME, KEY_BIRTH_DATE,
+					KEY_GENDER }, KEY_IDENTIFIER + " LIKE '" + identifier
+					+ "%' ESCAPE '^'", null, null, null, null, null);
 		}
 
 		if (c != null) {
@@ -268,12 +261,40 @@ public class PatientDbAdapter {
 		cv.put(KEY_GIVEN_NAME, patient.getGivenName());
 		cv.put(KEY_FAMILY_NAME, patient.getFamilyName());
 		cv.put(KEY_MIDDLE_NAME, patient.getMiddleName());
-		
-		cv.put(KEY_BIRTH_DATE, patient.getBirthdate() != null ? mDateFormat.format(patient.getBirthdate()) : mZeroDate);
+
+		cv.put(KEY_BIRTH_DATE,
+				patient.getBirthdate() != null ? mDateFormat.format(patient
+						.getBirthdate()) : mZeroDate);
 		cv.put(KEY_GENDER, patient.getGender());
 
 		return mDb.update(PATIENTS_TABLE, cv, KEY_PATIENT_ID + "='"
 				+ patient.getPatientId().toString() + "'", null) > 0;
+	}
+
+	public static boolean createStorage() {
+		if (storageReady()) {
+			File f = new File(DATABASE_PATH);
+			if (f.exists()) {
+				return true;
+			} else {
+				return f.mkdirs();
+			}
+		} else {
+			return false;
+		}
+
+	}
+
+	public static boolean storageReady() {
+		String cardstatus = Environment.getExternalStorageState();
+		if (cardstatus.equals(Environment.MEDIA_REMOVED)
+				|| cardstatus.equals(Environment.MEDIA_UNMOUNTABLE)
+				|| cardstatus.equals(Environment.MEDIA_UNMOUNTED)
+				|| cardstatus.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 }

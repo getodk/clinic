@@ -61,6 +61,15 @@ public class FindPatientActivity extends ListActivity {
 		setContentView(R.layout.find_patient);
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.find_patient));
+		
+		if (!PatientDbAdapter.storageReady()) {
+			Toast t = Toast.makeText(getApplicationContext(),
+					getString(R.string.error, R.string.storage_error),
+					Toast.LENGTH_LONG);
+			t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+			t.show();
+			finish();
+		}
 
 		mFilterTextWatcher = new TextWatcher() {
 			@Override
