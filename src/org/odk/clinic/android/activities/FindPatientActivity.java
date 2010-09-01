@@ -33,7 +33,7 @@ import android.widget.Toast;
 //TODO: multiple cohorts
 //TODO: display patient view data
 //TODO: display ages instead of dates
-//TODO: after download obs, why so slow?
+//TODO: optimize download patient task
 
 public class FindPatientActivity extends ListActivity {
 
@@ -223,11 +223,14 @@ public class FindPatientActivity extends ListActivity {
 					mPatients.add(p);
 				} while (c.moveToNext());
 			}
+		
 		}
 
 		refreshView();
 
-		c.close();
+		if (c != null) {
+			c.close();
+		}
 		pda.close();
 
 	}

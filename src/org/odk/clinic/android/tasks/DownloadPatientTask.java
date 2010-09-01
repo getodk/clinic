@@ -20,6 +20,8 @@ import android.os.AsyncTask;
 
 import com.jcraft.jzlib.ZInputStream;
 
+//TODO: too many objects being created. make this go faster.
+
 public class DownloadPatientTask extends
 		AsyncTask<String, String, HashMap<String, Object>> {
 
@@ -34,7 +36,7 @@ public class DownloadPatientTask extends
 
 	@Override
 	protected HashMap<String, Object> doInBackground(String... values) {
-		
+
 		String url = values[0];
 		String username = values[1];
 		String password = values[2];
@@ -113,6 +115,7 @@ public class DownloadPatientTask extends
 		}
 
 		dos.flush();
+		dos.close();
 
 		// read connection status
 		DataInputStream zdis = null;
@@ -171,8 +174,8 @@ public class DownloadPatientTask extends
 			zdis.readBoolean(); // ignore new patient
 
 			patients.add(p);
-			publishProgress("patients", Integer.valueOf(i)
-					.toString(), Integer.valueOf(c*2).toString());
+			publishProgress("patients", Integer.valueOf(i).toString(), Integer
+					.valueOf(c * 2).toString());
 		}
 
 		return patients;
@@ -200,8 +203,8 @@ public class DownloadPatientTask extends
 
 		// for every patient
 		int icount = zdis.readInt();
-		for (int i = 1; i < icount+1; i++) {
-			
+		for (int i = 1; i < icount + 1; i++) {
+
 			// get patient id
 			int patientId = zdis.readInt();
 
@@ -211,11 +214,11 @@ public class DownloadPatientTask extends
 
 				// get field name
 				String fieldName = zdis.readUTF();
-				
+
 				// get ob values
 				int kcount = zdis.readInt();
 				for (int k = 0; k < kcount; k++) {
-					
+
 					Observation o = new Observation();
 					o.setPatientId(patientId);
 					o.setFieldName(fieldName);
@@ -235,9 +238,9 @@ public class DownloadPatientTask extends
 					obs.add(o);
 				}
 			}
-			
-			publishProgress("history", Integer.valueOf(i+icount)
-					.toString(), Integer.valueOf(icount*2).toString());
+
+			publishProgress("history", Integer.valueOf(i + icount).toString(),
+					Integer.valueOf(icount * 2).toString());
 		}
 
 		return obs;

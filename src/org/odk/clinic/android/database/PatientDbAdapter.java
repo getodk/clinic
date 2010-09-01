@@ -221,7 +221,7 @@ public class PatientDbAdapter {
 			// search using identifier
 
 			// escape all wildcard characters
-			identifier = identifier.replaceAll("*", "^*");
+			identifier = identifier.replaceAll("\\*", "^*");
 			identifier = identifier.replaceAll("%", "^%");
 			identifier = identifier.replaceAll("_", "^_");
 
