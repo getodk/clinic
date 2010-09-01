@@ -32,12 +32,9 @@ import android.widget.Toast;
 
 //TODO: download cohort list
 //TODO: multiple cohorts
-//TODO: error correction if connection fails
 //TODO: display ages instead of dates
-//TODO: differential and faster download
-//TODO: more underlying data
-//TODO: logging stuff
 //TODO: filter does not work on refresh
+//TODO: after download obs, why so slow?
 
 public class FindPatientActivity extends ListActivity {
 
