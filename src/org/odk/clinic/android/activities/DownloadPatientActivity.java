@@ -1,14 +1,8 @@
 package org.odk.clinic.android.activities;
 
-import java.util.HashMap;
-import java.util.List;
-
 import org.odk.clinic.android.R;
-import org.odk.clinic.android.database.PatientDbAdapter;
 import org.odk.clinic.android.listeners.DownloadPatientListener;
 import org.odk.clinic.android.openmrs.Constants;
-import org.odk.clinic.android.openmrs.Observation;
-import org.odk.clinic.android.openmrs.Patient;
 import org.odk.clinic.android.preferences.ServerPreferences;
 import org.odk.clinic.android.tasks.DownloadPatientTask;
 
@@ -88,7 +82,6 @@ public class DownloadPatientActivity extends Activity implements
 			mProgressDialog.setIndeterminate(false);
 			mProgressDialog.setCancelable(false);
 			mProgressDialog.setMax(0);
-			mProgressDialog.setProgress(0);
 			mProgressDialog.setButton(getString(R.string.cancel),
 					loadingButtonListener);
 			return mProgressDialog;

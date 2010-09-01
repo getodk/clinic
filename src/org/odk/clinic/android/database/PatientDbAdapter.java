@@ -8,7 +8,6 @@ import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
@@ -46,7 +45,7 @@ public class PatientDbAdapter {
 	private static final String DATABASE_NAME = "clinic.sqlite3";
 	private static final String PATIENTS_TABLE = "patients";
 	private static final String OBSERVATIONS_TABLE = "observations";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	 private static final String DATABASE_PATH =
 	        Environment.getExternalStorageDirectory() + "/clinic";
 
@@ -74,9 +73,10 @@ public class PatientDbAdapter {
 		DatabaseHelper() {
 			super(DATABASE_PATH, DATABASE_NAME, null, DATABASE_VERSION);
 
-            // Create database storage directory if it doesn't not already exist.
+            // create database storage directory if it doesn't not already exist.
             File f = new File(DATABASE_PATH);
-            f.mkdirs();		}
+            f.mkdirs();		
+       }
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
