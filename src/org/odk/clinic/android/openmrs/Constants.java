@@ -86,4 +86,8 @@ public class Constants {
 	public static final int TYPE_FLOAT = 3;
 	public static final int TYPE_DATE = 4;
 	
+	
+	public static final String KEY_PATIENT_ID = "PATIENT_ID";
+	public static final String KEY_PATIENT_NAME = "PATIENT_NAME";
+	public static final String KEY_PATIENT_IDENTIFIER = "PATIENT_IDENTIFIER";
 }

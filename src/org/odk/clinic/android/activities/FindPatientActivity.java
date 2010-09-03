@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.adapters.PatientAdapter;
 import org.odk.clinic.android.database.PatientDbAdapter;
+import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Patient;
 import org.odk.clinic.android.preferences.ServerPreferences;
 
@@ -132,6 +133,9 @@ public class FindPatientActivity extends ListActivity {
 
 		Intent ip = new Intent(getApplicationContext(),
 				ShowPatientActivity.class);
+		ip.putExtra(Constants.KEY_PATIENT_ID, patientIdStr);
+		ip.putExtra(Constants.KEY_PATIENT_NAME, p.getName());
+		ip.putExtra(Constants.KEY_PATIENT_IDENTIFIER, p.getIdentifier());
 		startActivity(ip);
 	}
 

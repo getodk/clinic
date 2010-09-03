@@ -80,4 +80,26 @@ public class Patient {
 		gender = g;
 	}
 
+	public String getName(){
+		String name = "";
+		
+		if(givenName != null)
+			name = givenName;
+		
+		if(middleName != null){
+			if(name.length() > 0)
+				name += " ";
+			
+			name += middleName;
+		}
+		
+		if(familyName != null){
+			if(name.length() > 0)
+				name += " ";
+			
+			name += familyName;
+		}
+		
+		return name;
+	}
 }

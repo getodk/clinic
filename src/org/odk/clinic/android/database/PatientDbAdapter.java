@@ -35,6 +35,7 @@ public class PatientDbAdapter {
 	public static final String KEY_VALUE_INT = "value_int";
 	public static final String KEY_FIELD_NAME = "field_name";
 	public static final String KEY_ENCOUNTER_DATE = "encounter_date";
+	public static final String KEY_DATA_TYPE = "data_type";
 
 	private DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private String mZeroDate = "0000-00-00 00:00:00";
@@ -45,7 +46,7 @@ public class PatientDbAdapter {
 	private static final String DATABASE_NAME = "clinic.sqlite3";
 	private static final String PATIENTS_TABLE = "patients";
 	private static final String OBSERVATIONS_TABLE = "observations";
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 	private static final String DATABASE_PATH = Environment
 			.getExternalStorageDirectory() + "/clinic";
 
@@ -58,7 +59,8 @@ public class PatientDbAdapter {
 
 	private static final String CREATE_OBSERVATIONS_TABLE = "create table "
 			+ OBSERVATIONS_TABLE + " (_id integer primary key autoincrement, "
-			+ KEY_PATIENT_ID + " integer not null, " + KEY_VALUE_TEXT
+			+ KEY_PATIENT_ID + " integer not null, " 
+			+ KEY_DATA_TYPE + " integer not null, " + KEY_VALUE_TEXT
 			+ " text, " + KEY_VALUE_NUMERIC + " double, " + KEY_VALUE_DATE
 			+ " datetime, " + KEY_VALUE_INT + " integer, " + KEY_FIELD_NAME
 			+ " text not null, " + KEY_ENCOUNTER_DATE + " datetime not null);";
@@ -140,6 +142,9 @@ public class PatientDbAdapter {
 		cv.put(KEY_VALUE_INT, obs.getValueInt());
 
 		cv.put(KEY_FIELD_NAME, obs.getFieldName());
+		
+		cv.put(KEY_DATA_TYPE, obs.getDataType());
+		
 		cv.put(KEY_ENCOUNTER_DATE,
 				obs.getEncounterDate() != null ? mDateFormat.format(obs
 						.getEncounterDate()) : mZeroDate);
@@ -297,4 +302,17 @@ public class PatientDbAdapter {
 		}
 	}
 
+	public Cursor fetchPatientObservations(String patientId) throws SQLException {
+		Cursor c = null;
+		
+		c = mDb.query(OBSERVATIONS_TABLE, new String[] {KEY_VALUE_TEXT, KEY_VALUE_TEXT, KEY_DATA_TYPE,
+				KEY_VALUE_NUMERIC, KEY_VALUE_DATE, KEY_VALUE_INT, KEY_FIELD_NAME, KEY_ENCOUNTER_DATE},
+				KEY_PATIENT_ID + "=" + patientId, null, null, null, 
+				KEY_FIELD_NAME + "," + KEY_ENCOUNTER_DATE + " desc");
+		
+		if(c != null)
+			c.moveToFirst();
+		
+		return c;
+	}
 }

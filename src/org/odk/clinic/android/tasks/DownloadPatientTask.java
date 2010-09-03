@@ -227,17 +227,18 @@ public class DownloadPatientTask extends
 					o.setPatientId(patientId);
 					o.setFieldName(fieldName);
 
-					int type = zdis.readByte();
-					if (type == Constants.TYPE_STRING) {
+					byte dataType = zdis.readByte();
+					if (dataType == Constants.TYPE_STRING) {
 						o.setValueText(zdis.readUTF());
-					} else if (type == Constants.TYPE_INT) {
+					} else if (dataType == Constants.TYPE_INT) {
 						o.setValueInt(zdis.readInt());
-					} else if (type == Constants.TYPE_FLOAT) {
+					} else if (dataType == Constants.TYPE_FLOAT) {
 						o.setValueNumeric(zdis.readFloat());
-					} else if (type == Constants.TYPE_DATE) {
+					} else if (dataType == Constants.TYPE_DATE) {
 						o.setValueDate(new Date(zdis.readLong()));
 					}
 
+					o.setDataType(dataType);
 					o.setEncounterDate(new Date(zdis.readLong()));
 					mPatientDbAdapter.createObservation(o);
 				}

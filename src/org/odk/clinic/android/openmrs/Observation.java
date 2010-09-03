@@ -11,6 +11,7 @@ public class Observation {
 	private String valueText;
 	private Date encounterDate;
 	private String fieldName;
+	private byte dataType;
 	
 	
 	public Integer getPatientId() {
@@ -67,5 +68,13 @@ public class Observation {
 
 	public void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
+	}
+
+	public byte getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(byte dataType) {
+		this.dataType = dataType;
 	}
 }
