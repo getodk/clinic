@@ -14,12 +14,14 @@ import org.odk.clinic.android.preferences.ServerPreferences;
 
 import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 // TODO Display patient view data
@@ -62,14 +65,10 @@ public class FindPatientActivity extends ListActivity {
 				+ getString(R.string.find_patient));
 		
 		if (!PatientDbAdapter.storageReady()) {
-			Toast t = Toast.makeText(getApplicationContext(),
-					getString(R.string.error, R.string.storage_error),
-					Toast.LENGTH_LONG);
-			t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-			t.show();
+			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}
-
+		
 		mFilterTextWatcher = new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
@@ -124,11 +123,6 @@ public class FindPatientActivity extends ListActivity {
 		i.putExtra("SCAN_RESULT", patientIdStr);
 		setResult(RESULT_OK, i);
 
-		Toast t = Toast.makeText(getApplicationContext(), "Selected patient "
-				+ patientIdStr, Toast.LENGTH_SHORT);
-		t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-		t.show();
-
 		Intent ip = new Intent(getApplicationContext(),
 				ShowPatientActivity.class);
 		ip.putExtra(Constants.KEY_PATIENT_ID, patientIdStr);
@@ -141,7 +135,7 @@ public class FindPatientActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_DOWNLOAD, 0, getString(R.string.download_patients))
-				.setIcon(R.drawable.ic_menu_refresh);
+				.setIcon(R.drawable.ic_menu_invite);
 		menu.add(0, MENU_PREFERENCES, 0, getString(R.string.server_preferences))
 				.setIcon(android.R.drawable.ic_menu_preferences);
 		return true;
@@ -281,4 +275,18 @@ public class FindPatientActivity extends ListActivity {
 		super.onSaveInstanceState(outState);
 	}
 
+	private void showCustomToast(String message) {
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = inflater.inflate(R.layout.toast_view, null);
+
+		// set the text in the view
+		TextView tv = (TextView) view.findViewById(R.id.message);
+		tv.setText(message);
+
+		Toast t = new Toast(this);
+		t.setView(view);
+		t.setDuration(Toast.LENGTH_LONG);
+		t.setGravity(Gravity.CENTER, 0, 0);
+		t.show();
+	}
 }

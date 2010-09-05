@@ -16,12 +16,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 // TODO Merge this activity into FindPatientActivity
@@ -35,7 +39,7 @@ public class DownloadPatientActivity extends Activity implements
 	
 	private AlertDialog mCohortDialog;
 	private ProgressDialog mProgressDialog;
-
+	
 	private DownloadTask mDownloadTask;
 	
 	private ArrayList<Cohort> mCohorts = new ArrayList<Cohort>();
@@ -48,11 +52,7 @@ public class DownloadPatientActivity extends Activity implements
 				+ getString(R.string.download_patients));
 
 		if (!PatientDbAdapter.storageReady()) {
-			Toast t = Toast.makeText(getApplicationContext(),
-					getString(R.string.error, R.string.storage_error),
-					Toast.LENGTH_LONG);
-			t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-			t.show();
+			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}
 		
@@ -152,6 +152,7 @@ public class DownloadPatientActivity extends Activity implements
 
 	}
 
+	//TODO: combine into one button listener
 	private AlertDialog createCohortDialog() {
 		
 		DialogInterface.OnClickListener refreshButtonListener = new DialogInterface.OnClickListener() {
@@ -170,6 +171,15 @@ public class DownloadPatientActivity extends Activity implements
 				removeDialog(COHORT_DIALOG);
 				mCohortDialog = null;
 				downloadPatients();
+			}
+		};
+		
+		DialogInterface.OnClickListener backButtonListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				removeDialog(COHORT_DIALOG);
+				mCohortDialog = null;
+				finish();
 			}
 		};
 		
@@ -197,9 +207,8 @@ public class DownloadPatientActivity extends Activity implements
 				.getDefaultSharedPreferences(getBaseContext());
 		int cohortId = settings.getInt(ServerPreferences.KEY_COHORT, -1);
 
-		// TODO Move strings into strings.xml
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Select a cohort to download");
+		builder.setTitle(getString(R.string.select_cohort));
 
 		if (!mCohorts.isEmpty()) {
 			
@@ -214,11 +223,12 @@ public class DownloadPatientActivity extends Activity implements
 			}
 			builder.setSingleChoiceItems(cohortNames, selectedCohortIndex,
 					itemClickListener);
-			builder.setPositiveButton("OK", okayButtonListener);
+			builder.setPositiveButton(getString(R.string.download), okayButtonListener);
 		} else {
-			builder.setMessage("No cohorts available.");
+			builder.setMessage(getString(R.string.no_cohort));
 		}
-		builder.setNeutralButton("Refresh", refreshButtonListener);
+		builder.setNeutralButton(getString(R.string.refresh), refreshButtonListener);
+		builder.setNegativeButton(getString(R.string.cancel), backButtonListener);
 		builder.setOnCancelListener(cancelListener);
 
 		return builder.create();
@@ -239,8 +249,7 @@ public class DownloadPatientActivity extends Activity implements
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		dialog.setIndeterminate(false);
 		dialog.setCancelable(false);
-		dialog.setMax(100);
-		dialog.setButton(getString(R.string.cancel),
+		dialog.setButton(getString(R.string.cancel_download),
 				loadingButtonListener);
 		
 		return dialog;
@@ -266,7 +275,6 @@ public class DownloadPatientActivity extends Activity implements
 		if (id == COHORTS_PROGRESS_DIALOG || id == PATIENTS_PROGRESS_DIALOG) {
 			ProgressDialog progress = (ProgressDialog) dialog;
 			progress.setTitle(getString(R.string.connecting_server));
-			progress.setMax(100);
 			progress.setProgress(0);
 		}
 	}
@@ -278,13 +286,8 @@ public class DownloadPatientActivity extends Activity implements
 		}
 		
 		if (result != null) {
-			Toast t = Toast.makeText(getApplicationContext(),
-					getString(R.string.error, result), Toast.LENGTH_LONG);
-			t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-			t.show();
-			
+			showCustomToast(getString(R.string.error, result));
 			showDialog(COHORT_DIALOG);
-			
 		} else if (mDownloadTask instanceof DownloadCohortTask) {
 			getAllCohorts();
 			showDialog(COHORT_DIALOG);
@@ -335,4 +338,18 @@ public class DownloadPatientActivity extends Activity implements
 		super.onPause();
 	}
 
+	private void showCustomToast(String message) {
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = inflater.inflate(R.layout.toast_view, null);
+
+		// set the text in the view
+		TextView tv = (TextView) view.findViewById(R.id.message);
+		tv.setText(message);
+
+		Toast t = new Toast(this);
+		t.setView(view);
+		t.setDuration(Toast.LENGTH_LONG);
+		t.setGravity(Gravity.CENTER, 0, 0);
+		t.show();
+	}
 }

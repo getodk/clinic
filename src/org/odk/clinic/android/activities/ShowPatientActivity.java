@@ -10,11 +10,15 @@ import org.odk.clinic.android.database.PatientDbAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 
 import android.app.ExpandableListActivity;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ExpandableListAdapter;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ShowPatientActivity extends ExpandableListActivity {
@@ -34,13 +38,10 @@ public class ShowPatientActivity extends ExpandableListActivity {
 				+ name + " - " + identifier /*getString(R.string.show_patient)*/);
 
 		if (!PatientDbAdapter.storageReady()) {
-			Toast t = Toast.makeText(getApplicationContext(),
-					getString(R.string.error, R.string.storage_error),
-					Toast.LENGTH_LONG);
-			t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-			t.show();
+			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}
+		
 
 		String patientId = getIntent().getStringExtra(Constants.KEY_PATIENT_ID);
 		PatientDbAdapter pda = new PatientDbAdapter();
@@ -121,4 +122,18 @@ public class ShowPatientActivity extends ExpandableListActivity {
 		pda.close();
 	}
 
+	private void showCustomToast(String message) {
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = inflater.inflate(R.layout.toast_view, null);
+
+		// set the text in the view
+		TextView tv = (TextView) view.findViewById(R.id.message);
+		tv.setText(message);
+
+		Toast t = new Toast(this);
+		t.setView(view);
+		t.setDuration(Toast.LENGTH_LONG);
+		t.setGravity(Gravity.CENTER, 0, 0);
+		t.show();
+	}
 }
