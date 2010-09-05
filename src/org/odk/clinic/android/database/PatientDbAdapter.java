@@ -52,7 +52,7 @@ public class PatientDbAdapter {
 	private static final String PATIENTS_TABLE = "patients";
 	private static final String OBSERVATIONS_TABLE = "observations";
 	private static final String COHORTS_TABLE = "cohorts";
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 	private static final String DATABASE_PATH = Environment
 			.getExternalStorageDirectory() + "/clinic";
 
