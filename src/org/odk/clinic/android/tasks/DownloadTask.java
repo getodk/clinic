@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.odk.clinic.android.database.PatientDbAdapter;
+import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.listeners.DownloadListener;
 import org.odk.clinic.android.openmrs.Constants;
 
@@ -18,7 +18,7 @@ public abstract class DownloadTask extends
 		AsyncTask<String, String, String> {
 
 	protected DownloadListener mStateListener;
-	protected PatientDbAdapter mPatientDbAdapter = new PatientDbAdapter();
+	protected ClinicAdapter mPatientDbAdapter = new ClinicAdapter();
 
 	@Override
 	protected void onProgressUpdate(String... values) {

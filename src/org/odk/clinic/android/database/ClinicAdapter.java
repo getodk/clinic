@@ -16,7 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.util.Log;
 
-public class PatientDbAdapter {
+public class ClinicAdapter {
 	private final static String t = "PatientDbAdapter";
 
 	// patient columns
@@ -99,7 +99,7 @@ public class PatientDbAdapter {
 		}
 	}
 
-	public PatientDbAdapter open() throws SQLException {
+	public ClinicAdapter open() throws SQLException {
 		mDbHelper = new DatabaseHelper();
 		mDb = mDbHelper.getWritableDatabase();
 		return this;

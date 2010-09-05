@@ -7,7 +7,6 @@ import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.listeners.DownloadListener;
 import org.odk.clinic.android.openmrs.Cohort;
 import org.odk.clinic.android.openmrs.Constants;
-import org.odk.clinic.android.preferences.ServerPreferences;
 import org.odk.clinic.android.tasks.DownloadCohortTask;
 import org.odk.clinic.android.tasks.DownloadPatientTask;
 import org.odk.clinic.android.tasks.DownloadTask;
@@ -60,7 +59,7 @@ public class DownloadPatientActivity extends Activity implements
 		// cohort selection dialog
 		mDownloadTask = (DownloadTask) getLastNonConfigurationInstance();
 		if (mDownloadTask == null) {
-			getAllCohorts();
+			getCohorts();
 			showDialog(COHORT_DIALOG);
 		}
 	}
@@ -76,14 +75,14 @@ public class DownloadPatientActivity extends Activity implements
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getBaseContext());
 
-		String url = settings.getString(ServerPreferences.KEY_SERVER,
+		String url = settings.getString(PreferencesActivity.KEY_SERVER,
 				getString(R.string.default_server))
 				+ Constants.USER_DOWNLOAD_URL;
 		String username = settings.getString(
-				ServerPreferences.KEY_USERNAME,
+				PreferencesActivity.KEY_USERNAME,
 				getString(R.string.default_username));
 		String password = settings.getString(
-				ServerPreferences.KEY_PASSWORD,
+				PreferencesActivity.KEY_PASSWORD,
 				getString(R.string.default_password));
 
 		mDownloadTask = new DownloadCohortTask();
@@ -103,14 +102,14 @@ public class DownloadPatientActivity extends Activity implements
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getBaseContext());
 
-		String url = settings.getString(ServerPreferences.KEY_SERVER,
+		String url = settings.getString(PreferencesActivity.KEY_SERVER,
 				getString(R.string.default_server))
 				+ Constants.USER_DOWNLOAD_URL;
-		String username = settings.getString(ServerPreferences.KEY_USERNAME,
+		String username = settings.getString(PreferencesActivity.KEY_USERNAME,
 				getString(R.string.default_username));
-		String password = settings.getString(ServerPreferences.KEY_PASSWORD,
+		String password = settings.getString(PreferencesActivity.KEY_PASSWORD,
 				getString(R.string.default_password));
-		int cohortId = settings.getInt(ServerPreferences.KEY_COHORT, -1);
+		int cohortId = settings.getInt(PreferencesActivity.KEY_COHORT, -1);
 
 		mDownloadTask = new DownloadPatientTask();
 		mDownloadTask.setServerConnectionListener(DownloadPatientActivity.this);
@@ -118,7 +117,7 @@ public class DownloadPatientActivity extends Activity implements
 				.toString(cohortId));
 	}
 	
-	private void getAllCohorts() {
+	private void getCohorts() {
 
 		ClinicAdapter pda = new ClinicAdapter();
 
@@ -191,7 +190,7 @@ public class DownloadPatientActivity extends Activity implements
 				SharedPreferences settings = PreferenceManager
 						.getDefaultSharedPreferences(getBaseContext());
 				SharedPreferences.Editor editor = settings.edit();
-				editor.putInt(ServerPreferences.KEY_COHORT, c.getCohortId().intValue());
+				editor.putInt(PreferencesActivity.KEY_COHORT, c.getCohortId().intValue());
 				editor.commit();
 			}
 		};
@@ -205,7 +204,7 @@ public class DownloadPatientActivity extends Activity implements
 		
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getBaseContext());
-		int cohortId = settings.getInt(ServerPreferences.KEY_COHORT, -1);
+		int cohortId = settings.getInt(PreferencesActivity.KEY_COHORT, -1);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.select_cohort));
@@ -234,7 +233,7 @@ public class DownloadPatientActivity extends Activity implements
 		return builder.create();
 	}
 	
-	private ProgressDialog createProgressDialog() {
+	private ProgressDialog createDownloadDialog() {
 		
 		ProgressDialog dialog = new ProgressDialog(this);
 		DialogInterface.OnClickListener loadingButtonListener = new DialogInterface.OnClickListener() {
@@ -262,7 +261,7 @@ public class DownloadPatientActivity extends Activity implements
 			mCohortDialog = createCohortDialog();
 			return mCohortDialog;
 		} else if (id == COHORTS_PROGRESS_DIALOG || id == PATIENTS_PROGRESS_DIALOG) {
-			mProgressDialog = createProgressDialog();
+			mProgressDialog = createDownloadDialog();
 			return mProgressDialog;
 		}
 
@@ -289,7 +288,7 @@ public class DownloadPatientActivity extends Activity implements
 			showCustomToast(getString(R.string.error, result));
 			showDialog(COHORT_DIALOG);
 		} else if (mDownloadTask instanceof DownloadCohortTask) {
-			getAllCohorts();
+			getCohorts();
 			showDialog(COHORT_DIALOG);
 			
 		} else {

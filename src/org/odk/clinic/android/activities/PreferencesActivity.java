@@ -1,4 +1,4 @@
-package org.odk.clinic.android.preferences;
+package org.odk.clinic.android.activities;
 
 import org.odk.clinic.android.R;
 
@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
 
-public class ServerPreferences extends PreferenceActivity implements
+public class PreferencesActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
 
 	public static String KEY_SERVER = "server";

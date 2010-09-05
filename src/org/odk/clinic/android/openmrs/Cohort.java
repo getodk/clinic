@@ -1,5 +1,7 @@
 package org.odk.clinic.android.openmrs;
 
+
+// TODO add description
 public class Cohort {
 
 	private Integer cohortId = null;

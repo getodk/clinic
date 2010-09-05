@@ -10,7 +10,6 @@ import org.odk.clinic.android.adapters.PatientAdapter;
 import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Patient;
-import org.odk.clinic.android.preferences.ServerPreferences;
 
 import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
@@ -37,7 +36,7 @@ import android.widget.Toast;
 // TODO Display ages instead of dates
 // TODO Optimize download patient task
 
-public class FindPatientActivity extends ListActivity {
+public class ListPatientActivity extends ListActivity {
 
 	private static final int MENU_DOWNLOAD = Menu.FIRST;
 	private static final int MENU_PREFERENCES = MENU_DOWNLOAD + 1;
@@ -151,7 +150,7 @@ public class FindPatientActivity extends ListActivity {
 			return true;
 		case MENU_PREFERENCES:
 			Intent ip = new Intent(getApplicationContext(),
-					ServerPreferences.class);
+					PreferencesActivity.class);
 			startActivity(ip);
 
 		}
@@ -175,11 +174,11 @@ public class FindPatientActivity extends ListActivity {
 
 	}
 
-	private void getAllPatients() {
-		getFoundPatients(null);
+	private void getPatients() {
+		getPatients(null);
 	}
 
-	private void getFoundPatients(String searchStr) {
+	private void getPatients(String searchStr) {
 
 		ClinicAdapter pda = new ClinicAdapter();
 		DateFormat mdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -258,7 +257,7 @@ public class FindPatientActivity extends ListActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		getAllPatients();
+		getPatients();
 		// hack to trigger refilter
 		mSearchText.setText(mSearchText.getText().toString());
 

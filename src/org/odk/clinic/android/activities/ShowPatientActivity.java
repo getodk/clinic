@@ -21,6 +21,7 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// TODO only pass in patient id
 public class ShowPatientActivity extends ExpandableListActivity {
 	private static final String FIELD_NAME = "FIELD_NAME";
 	private static final String ENCOUNTER_DATE = "ENCOUNTER_DATE";
