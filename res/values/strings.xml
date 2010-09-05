@@ -46,4 +46,5 @@ the License.
 	<string name="server_preferences">Change Settings</string>
 	<string name="username">Username</string>
 
+<string name="select_cohort">Select Cohort</string>
 </resources>
