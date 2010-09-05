@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.odk.clinic.android.R;
-import org.odk.clinic.android.database.PatientDbAdapter;
+import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 
 import android.app.ExpandableListActivity;
@@ -37,26 +37,26 @@ public class ShowPatientActivity extends ExpandableListActivity {
 		setTitle(getString(R.string.app_name) + " > "
 				+ name + " - " + identifier /*getString(R.string.show_patient)*/);
 
-		if (!PatientDbAdapter.storageReady()) {
+		if (!ClinicAdapter.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}
 		
 
 		String patientId = getIntent().getStringExtra(Constants.KEY_PATIENT_ID);
-		PatientDbAdapter pda = new PatientDbAdapter();
+		ClinicAdapter pda = new ClinicAdapter();
 		pda.open();
 		Cursor c = pda.fetchPatientObservations(patientId);
 
 		if(c != null){
 
-			int valueTextIndex = c.getColumnIndex(PatientDbAdapter.KEY_VALUE_TEXT);
-			int valueIntIndex = c.getColumnIndex(PatientDbAdapter.KEY_VALUE_INT);
-			int valueDateIndex = c.getColumnIndex(PatientDbAdapter.KEY_VALUE_DATE);
-			int valueNumericIndex = c.getColumnIndex(PatientDbAdapter.KEY_VALUE_NUMERIC);
-			int fieldNameIndex = c.getColumnIndex(PatientDbAdapter.KEY_FIELD_NAME);
-			int encounterDateIndex = c.getColumnIndex(PatientDbAdapter.KEY_ENCOUNTER_DATE);
-			int dataTypeIndex = c.getColumnIndex(PatientDbAdapter.KEY_DATA_TYPE);
+			int valueTextIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_TEXT);
+			int valueIntIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_INT);
+			int valueDateIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_DATE);
+			int valueNumericIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_NUMERIC);
+			int fieldNameIndex = c.getColumnIndex(ClinicAdapter.KEY_FIELD_NAME);
+			int encounterDateIndex = c.getColumnIndex(ClinicAdapter.KEY_ENCOUNTER_DATE);
+			int dataTypeIndex = c.getColumnIndex(ClinicAdapter.KEY_DATA_TYPE);
 
 			List<Map<String, String>> groupData = new ArrayList<Map<String, String>>();
 			List<List<Map<String, String>>> childData = new ArrayList<List<Map<String, String>>>();

@@ -3,7 +3,7 @@ package org.odk.clinic.android.activities;
 import java.util.ArrayList;
 
 import org.odk.clinic.android.R;
-import org.odk.clinic.android.database.PatientDbAdapter;
+import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.listeners.DownloadListener;
 import org.odk.clinic.android.openmrs.Cohort;
 import org.odk.clinic.android.openmrs.Constants;
@@ -51,7 +51,7 @@ public class DownloadPatientActivity extends Activity implements
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.download_patients));
 
-		if (!PatientDbAdapter.storageReady()) {
+		if (!ClinicAdapter.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}
@@ -120,7 +120,7 @@ public class DownloadPatientActivity extends Activity implements
 	
 	private void getAllCohorts() {
 
-		PatientDbAdapter pda = new PatientDbAdapter();
+		ClinicAdapter pda = new ClinicAdapter();
 
 		pda.open();
 		Cursor c = pda.fetchAllCohorts();
@@ -130,9 +130,9 @@ public class DownloadPatientActivity extends Activity implements
 			mCohorts.clear();
 
 			int cohortIdIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_COHORT_ID);
+					.getColumnIndex(ClinicAdapter.KEY_COHORT_ID);
 			int nameIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_COHORT_NAME);
+					.getColumnIndex(ClinicAdapter.KEY_COHORT_NAME);
 
 			Cohort cohort;
 			if (c.getCount() > 0) {

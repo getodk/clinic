@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.adapters.PatientAdapter;
-import org.odk.clinic.android.database.PatientDbAdapter;
+import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Patient;
 import org.odk.clinic.android.preferences.ServerPreferences;
@@ -64,7 +64,7 @@ public class FindPatientActivity extends ListActivity {
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.find_patient));
 		
-		if (!PatientDbAdapter.storageReady()) {
+		if (!ClinicAdapter.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}
@@ -181,7 +181,7 @@ public class FindPatientActivity extends ListActivity {
 
 	private void getFoundPatients(String searchStr) {
 
-		PatientDbAdapter pda = new PatientDbAdapter();
+		ClinicAdapter pda = new ClinicAdapter();
 		DateFormat mdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		pda.open();
@@ -197,18 +197,18 @@ public class FindPatientActivity extends ListActivity {
 			mPatients.clear();
 
 			int patientIdIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_PATIENT_ID);
+					.getColumnIndex(ClinicAdapter.KEY_PATIENT_ID);
 			int identifierIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_IDENTIFIER);
+					.getColumnIndex(ClinicAdapter.KEY_IDENTIFIER);
 			int givenNameIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_GIVEN_NAME);
+					.getColumnIndex(ClinicAdapter.KEY_GIVEN_NAME);
 			int familyNameIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_FAMILY_NAME);
+					.getColumnIndex(ClinicAdapter.KEY_FAMILY_NAME);
 			int middleNameIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_MIDDLE_NAME);
+					.getColumnIndex(ClinicAdapter.KEY_MIDDLE_NAME);
 			int birthDateIndex = c
-					.getColumnIndex(PatientDbAdapter.KEY_BIRTH_DATE);
-			int genderIndex = c.getColumnIndex(PatientDbAdapter.KEY_GENDER);
+					.getColumnIndex(ClinicAdapter.KEY_BIRTH_DATE);
+			int genderIndex = c.getColumnIndex(ClinicAdapter.KEY_GENDER);
 
 			Patient p;
 			if (c.getCount() > 0) {
