@@ -282,14 +282,17 @@ public class DownloadPatientActivity extends Activity implements
 					getString(R.string.error, result), Toast.LENGTH_LONG);
 			t.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
 			t.show();
-		}
-		
-		if (mDownloadTask instanceof DownloadCohortTask) {
+			
+			showDialog(COHORT_DIALOG);
+			
+		} else if (mDownloadTask instanceof DownloadCohortTask) {
 			getAllCohorts();
 			showDialog(COHORT_DIALOG);
+			
 		} else {
 			finish();
 		}
+		
 		mDownloadTask = null;
 	}
 
