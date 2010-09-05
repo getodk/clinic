@@ -25,14 +25,6 @@
     	        android:title="@string/password"
     	        android:dialogTitle="@string/change_password" 
     	        android:password="true" />
-    	
-    	<EditTextPreference
-    	        android:id="@+id/cohort"
-    	        android:key="cohort"
-    	        android:defaultValue="@string/default_cohort"            
-    	        android:title="@string/cohort"
-    	        android:dialogTitle="@string/change_cohort" 
-    	        android:inputType="numberSigned" />
 
     </PreferenceCategory>
       

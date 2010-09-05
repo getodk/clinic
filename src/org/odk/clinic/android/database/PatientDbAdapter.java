@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.odk.clinic.android.openmrs.Cohort;
 import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
 
@@ -18,7 +19,7 @@ import android.util.Log;
 public class PatientDbAdapter {
 	private final static String t = "PatientDbAdapter";
 
-	// patients columns
+	// patient columns
 	public static final String KEY_ID = "_id";
 	public static final String KEY_PATIENT_ID = "patient_id";
 	public static final String KEY_IDENTIFIER = "identifier";
@@ -36,6 +37,10 @@ public class PatientDbAdapter {
 	public static final String KEY_FIELD_NAME = "field_name";
 	public static final String KEY_ENCOUNTER_DATE = "encounter_date";
 	public static final String KEY_DATA_TYPE = "data_type";
+	
+	// cohort columns
+	public static final String KEY_COHORT_ID = "cohort_id";
+	public static final String KEY_COHORT_NAME = "name";
 
 	private DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private String mZeroDate = "0000-00-00 00:00:00";
@@ -46,7 +51,8 @@ public class PatientDbAdapter {
 	private static final String DATABASE_NAME = "clinic.sqlite3";
 	private static final String PATIENTS_TABLE = "patients";
 	private static final String OBSERVATIONS_TABLE = "observations";
-	private static final int DATABASE_VERSION = 5;
+	private static final String COHORTS_TABLE = "cohorts";
+	private static final int DATABASE_VERSION = 6;
 	private static final String DATABASE_PATH = Environment
 			.getExternalStorageDirectory() + "/clinic";
 
@@ -64,6 +70,10 @@ public class PatientDbAdapter {
 			+ " text, " + KEY_VALUE_NUMERIC + " double, " + KEY_VALUE_DATE
 			+ " datetime, " + KEY_VALUE_INT + " integer, " + KEY_FIELD_NAME
 			+ " text not null, " + KEY_ENCOUNTER_DATE + " datetime not null);";
+	
+	private static final String CREATE_COHORTS_TABLE = "create table "
+		+ COHORTS_TABLE + " (_id integer primary key autoincrement, "
+		+ KEY_COHORT_ID + " integer not null, " + KEY_COHORT_NAME + " text);";
 
 	private static class DatabaseHelper extends ODKSQLiteOpenHelper {
 
@@ -76,6 +86,7 @@ public class PatientDbAdapter {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(CREATE_PATIENTS_TABLE);
 			db.execSQL(CREATE_OBSERVATIONS_TABLE);
+			db.execSQL(CREATE_COHORTS_TABLE);
 		}
 
 		@Override
@@ -83,6 +94,7 @@ public class PatientDbAdapter {
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			db.execSQL("DROP TABLE IF EXISTS " + PATIENTS_TABLE);
 			db.execSQL("DROP TABLE IF EXISTS " + OBSERVATIONS_TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + COHORTS_TABLE);
 			onCreate(db);
 		}
 	}
@@ -158,6 +170,22 @@ public class PatientDbAdapter {
 
 		return id;
 	}
+	
+	public long createCohort(Cohort cohort) {
+		ContentValues cv = new ContentValues();
+
+		cv.put(KEY_COHORT_ID, cohort.getCohortId());
+		cv.put(KEY_COHORT_NAME, cohort.getName());
+
+		long id = -1;
+		try {
+			id = mDb.insert(COHORTS_TABLE, null, cv);
+		} catch (SQLiteConstraintException e) {
+			Log.e(t, "Caught SQLiteConstraitException: " + e);
+		}
+
+		return id;
+	}
 
 	/**
 	 * Remove all patients from the database.
@@ -170,6 +198,10 @@ public class PatientDbAdapter {
 
 	public boolean deleteAllObservations() {
 		return mDb.delete(OBSERVATIONS_TABLE, null, null) > 0;
+	}
+	
+	public boolean deleteAllCohorts() {
+		return mDb.delete(COHORTS_TABLE, null, null) > 0;
 	}
 
 	/**
@@ -242,6 +274,18 @@ public class PatientDbAdapter {
 		c = mDb.query(true, PATIENTS_TABLE, new String[] { KEY_ID,
 				KEY_PATIENT_ID, KEY_IDENTIFIER, KEY_GIVEN_NAME,
 				KEY_FAMILY_NAME, KEY_MIDDLE_NAME, KEY_BIRTH_DATE, KEY_GENDER },
+				null, null, null, null, null, null);
+
+		if (c != null) {
+			c.moveToFirst();
+		}
+		return c;
+	}
+	
+	public Cursor fetchAllCohorts() throws SQLException {
+		Cursor c = null;
+		c = mDb.query(true, COHORTS_TABLE, new String[] { KEY_ID,
+				KEY_COHORT_ID, KEY_COHORT_NAME },
 				null, null, null, null, null, null);
 
 		if (c != null) {

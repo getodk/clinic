@@ -1,37 +1,19 @@
 package org.odk.clinic.android.tasks;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Date;
 import java.util.Locale;
 
-import org.odk.clinic.android.database.PatientDbAdapter;
-import org.odk.clinic.android.listeners.DownloadPatientListener;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
 
-import android.os.AsyncTask;
+public class DownloadPatientTask extends DownloadTask {
 
-import com.jcraft.jzlib.ZInputStream;
-
-public class DownloadPatientTask extends
-		AsyncTask<String, String, String> {
-
-	DownloadPatientListener mStateListener;
 	public static final String KEY_ERROR = "error";
 	public static final String KEY_PATIENTS = "patients";
 	public static final String KEY_OBSERVATIONS = "observations";
-
-	int mAction = Constants.ACTION_DOWNLOAD_PATIENTS;
-	String mSerializer = Constants.DEFAULT_PATIENT_SERIALIZER;
-	String mLocale = Locale.getDefault().getLanguage();
 	
-	PatientDbAdapter mPatientDbAdapter = new PatientDbAdapter();
-
 	@Override
 	protected String doInBackground(String... values) {
 
@@ -40,20 +22,23 @@ public class DownloadPatientTask extends
 		String password = values[2];
 		int cohort = Integer.valueOf(values[3]).intValue();
 
+		int action = Constants.ACTION_DOWNLOAD_PATIENTS;
+		String serializer = Constants.DEFAULT_PATIENT_SERIALIZER;
+		String locale = Locale.getDefault().getLanguage();
 
 		try {
 			DataInputStream zdis = connectToServer(url, username, password,
-					cohort);
+					action, serializer, locale, cohort);
 			if (zdis != null) {
 				// open db and clean entries
 				mPatientDbAdapter.open();
 				mPatientDbAdapter.deleteAllPatients();
 				mPatientDbAdapter.deleteAllObservations();
-				
+
 				// download and insert patients and obs
 				insertPatients(zdis);
 				insertObservations(zdis);
-				
+
 				// close db and stream
 				mPatientDbAdapter.close();
 				zdis.close();
@@ -66,90 +51,11 @@ public class DownloadPatientTask extends
 		return null;
 	}
 
-	@Override
-	protected void onProgressUpdate(String... values) {
-		synchronized (this) {
-			if (mStateListener != null) {
-				// update progress and total
-				mStateListener.progressUpdate(values[0], new Integer(values[1])
-						.intValue(), new Integer(values[2]).intValue());
-			}
-		}
-
-	}
-
-	@Override
-	protected void onPostExecute(String result) {
-		synchronized (this) {
-			if (mStateListener != null)
-				mStateListener.downloadComplete(result);
-		}
-	}
-
-	public void setServerConnectionListener(DownloadPatientListener sl) {
-		synchronized (this) {
-			mStateListener = sl;
-		}
-	}
-
-	// url, username, password, serializer, locale, action, cohort
-	private DataInputStream connectToServer(String url, String username,
-			String password, int cohort) throws Exception {
-
-		// compose url
-		URL u = null;
-		u = new URL(url);
-
-		// setup http url connection
-		HttpURLConnection c = null;
-		c = (HttpURLConnection) u.openConnection();
-		c.setDoOutput(true);
-		c.setRequestMethod("POST");
-		c.addRequestProperty("Content-type", "application/octet-stream");
-		// write auth details to connection
-		DataOutputStream dos = null;
-		dos = new DataOutputStream(c.getOutputStream());
-		dos.writeUTF(username); // username
-		dos.writeUTF(password); // password
-
-		dos.writeUTF(mSerializer); // serializer
-		dos.writeUTF(mLocale); // locale
-		dos.writeByte(Integer.valueOf(mAction).byteValue());
-
-		if (mAction == Constants.ACTION_DOWNLOAD_PATIENTS && cohort > 0) {
-			dos.writeInt(cohort);
-		}
-
-		dos.flush();
-		dos.close();
-
-		// read connection status
-		DataInputStream zdis = null;
-		DataInputStream dis = new DataInputStream(c.getInputStream());
-		ZInputStream zis = new ZInputStream(dis);
-		zdis = new DataInputStream(zis);
-
-		int status = zdis.readByte();
-
-		if (status == Constants.STATUS_FAILURE) {
-			zdis = null;
-			throw new IOException("Connection failed. Please try again.");
-		} else if (status == Constants.STATUS_ACCESS_DENIED) {
-			zdis = null;
-			throw new IOException(
-					"Access denied. Check your username and password.");
-		} else {
-			assert (status == Constants.STATUS_SUCCESS); // success
-			return zdis;
-		}
-	}
-
-	private void insertPatients(DataInputStream zdis)
-			throws Exception {
+	private void insertPatients(DataInputStream zdis) throws Exception {
 
 		int c = zdis.readInt();
 
-		//List<Patient> patients = new ArrayList<Patient>(c);
+		// List<Patient> patients = new ArrayList<Patient>(c);
 		for (int i = 1; i < c + 1; i++) {
 			Patient p = new Patient();
 			if (zdis.readBoolean()) {
@@ -187,8 +93,7 @@ public class DownloadPatientTask extends
 
 	}
 
-	private void insertObservations(DataInputStream zdis)
-			throws Exception {
+	private void insertObservations(DataInputStream zdis) throws Exception {
 
 		// patient table fields
 		int count = zdis.readInt();
@@ -251,4 +156,3 @@ public class DownloadPatientTask extends
 	}
 	
 }
-

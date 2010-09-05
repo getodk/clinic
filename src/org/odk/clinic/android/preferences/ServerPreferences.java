@@ -25,7 +25,6 @@ public class ServerPreferences extends PreferenceActivity implements
 		updateServer();
 		updateUsername();
 		updatePassword();
-		updateCohort();
 
 	}
 
@@ -51,16 +50,7 @@ public class ServerPreferences extends PreferenceActivity implements
 			updateUsername();
 		} else if (key.equals(KEY_PASSWORD)) {
 			updatePassword();
-		} else if (key.equals(KEY_COHORT)) {
-			updateCohort();
 		}
-	}
-
-	private void updateCohort() {
-		EditTextPreference etp = (EditTextPreference) this
-				.getPreferenceScreen().findPreference(KEY_COHORT);
-		etp.setSummary(etp.getText());
-
 	}
 
 	private void updateServer() {

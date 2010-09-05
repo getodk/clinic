@@ -30,11 +30,9 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-//TODO: download cohort list
-//TODO: multiple cohorts
-//TODO: display patient view data
-//TODO: display ages instead of dates
-//TODO: optimize download patient task
+// TODO Display patient view data
+// TODO Display ages instead of dates
+// TODO Optimize download patient task
 
 public class FindPatientActivity extends ListActivity {
 
