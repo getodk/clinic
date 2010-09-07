@@ -16,19 +16,17 @@ import android.widget.TextView;
 
 public class PatientAdapter extends ArrayAdapter<Patient> {
 
-	private Context context;
 	private SimpleDateFormat mDateFormat = new SimpleDateFormat("MMM dd, yyyy");
 
 	public PatientAdapter(Context context, int textViewResourceId,
 			List<Patient> items) {
 		super(context, textViewResourceId, items);
-		this.context = context;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
 		if (v == null) {
-			LayoutInflater vi = (LayoutInflater) context
+			LayoutInflater vi = (LayoutInflater) getContext()
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			v = vi.inflate(R.layout.patient_list_item, null);
 		}

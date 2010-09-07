@@ -18,16 +18,13 @@
         android:paddingTop="6dip"
         android:paddingBottom="6dip"
     />
-  
-    <LinearLayout
-        android:id="@+id/chart"
-        android:orientation="horizontal"
+        
+    <ListView
+        android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="0dip"
         android:layout_weight="1.0"
-        android:paddingLeft="10dip"
-        android:paddingRight="10dip"
-        android:paddingTop="10dip"
-        android:paddingBottom="10dip" />
-  
+        android:listSelector="@android:color/transparent"
+    />
+        
 </LinearLayout>

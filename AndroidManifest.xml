@@ -32,6 +32,9 @@
 		<activity 
 			android:name=".activities.ObservationChartActivity"
 			android:label="@string/app_name" />
+		<activity 
+			android:name=".activities.ObservationTimelineActivity"
+			android:label="@string/app_name" />
 			
 	</application>
 	

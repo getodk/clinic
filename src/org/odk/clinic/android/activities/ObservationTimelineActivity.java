@@ -3,47 +3,39 @@ package org.odk.clinic.android.activities;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 
-import org.achartengine.ChartFactory;
-import org.achartengine.GraphicalView;
-import org.achartengine.chart.PointStyle;
-import org.achartengine.model.XYMultipleSeriesDataset;
-import org.achartengine.model.XYSeries;
-import org.achartengine.renderer.XYMultipleSeriesRenderer;
-import org.achartengine.renderer.XYSeriesRenderer;
 import org.odk.clinic.android.R;
+import org.odk.clinic.android.adapters.EncounterAdapter;
 import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
+import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.LinearLayout;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ObservationChartActivity extends Activity {
+public class ObservationTimelineActivity extends ListActivity {
 
 	private Patient mPatient;
 	private String mObservationFieldName;
-
-	private XYMultipleSeriesDataset mDataset = new XYMultipleSeriesDataset();
-	private XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
-
-	private GraphicalView mChartView;
+	
+	private ArrayAdapter<Observation> mEncounterAdapter;
+	private ArrayList<Observation> mEncounters = new ArrayList<Observation>();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.observation_chart);
+		setContentView(R.layout.observation_timeline);
 		
 		if (!ClinicAdapter.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
@@ -64,18 +56,6 @@ public class ObservationChartActivity extends Activity {
 		if (textView != null) {
 			textView.setText(mObservationFieldName);
 		}
-		
-		XYSeriesRenderer r = new XYSeriesRenderer();
-		r.setLineWidth(3.0f);
-		r.setColor(getResources().getColor(R.color.chart_red));
-		r.setPointStyle(PointStyle.CIRCLE);
-		r.setFillPoints(true);
-		
-		mRenderer.addSeriesRenderer(r);
-		mRenderer.setShowLegend(false);
-		mRenderer.setXTitle("Encounter Date");
-		mRenderer.setAxisTitleTextSize(14.0f);
-		mRenderer.setLabelsColor(getResources().getColor(android.R.color.black));
 	}
 	
 	private Patient getPatient(Integer patientId) {
@@ -134,63 +114,91 @@ public class ObservationChartActivity extends Activity {
 		
 		if (c != null && c.getCount() >= 0) {
 			
-			XYSeries series;
-			if (mDataset.getSeriesCount() > 0) {
-				series = mDataset.getSeriesAt(0);
-				series.clear();
-			} else {
-				series = new XYSeries(fieldName);
-				mDataset.addSeries(series);
-			}
+			mEncounters.clear();
 
+			int valueTextIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_TEXT);
 			int valueIntIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_INT);
+			int valueDateIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_DATE);
 			int valueNumericIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_NUMERIC);
 			int encounterDateIndex = c.getColumnIndex(ClinicAdapter.KEY_ENCOUNTER_DATE);
 			int dataTypeIndex = c.getColumnIndex(ClinicAdapter.KEY_DATA_TYPE);
 
+			Observation obs;
 			do {
+				obs = new Observation();
+				obs.setFieldName(fieldName);
 				try {
-					Date encounterDate = df.parse(c.getString(encounterDateIndex));
-					int dataType = c.getInt(dataTypeIndex);
-					
-					double value;
-					if (dataType == Constants.TYPE_INT) {
-						value = c.getInt(valueIntIndex);
-						series.add(encounterDate.getTime(), value);
-					} else if (dataType == Constants.TYPE_FLOAT) {
-						value = c.getFloat(valueNumericIndex);
-						series.add(encounterDate.getTime(), value);
-					}
+					obs.setEncounterDate(df.parse(c
+							.getString(encounterDateIndex)));
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
 
+				int dataType = c.getInt(dataTypeIndex);
+				obs.setDataType((byte) dataType);
+				switch (dataType) {
+				case Constants.TYPE_INT:
+					obs.setValueInt(c.getInt(valueIntIndex));
+					break;
+				case Constants.TYPE_FLOAT:
+					obs.setValueNumeric(c.getFloat(valueNumericIndex));
+					break;
+				case Constants.TYPE_DATE:
+					try {
+						obs.setValueDate(df.parse(c
+								.getString(valueDateIndex)));
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					break;
+				default:
+					obs.setValueText(c.getString(valueTextIndex));
+				}
+
+				mEncounters.add(obs);
+
 			} while(c.moveToNext());
 		}
 
+		refreshView();
+		
 		if (c != null) {
 			c.close();
 		}
 		ca.close();
 	}
 	
+	private void refreshView() {
+
+		mEncounterAdapter = new EncounterAdapter(this, R.layout.encounter_list_item,
+				mEncounters);
+		setListAdapter(mEncounterAdapter);
+
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+		
 		if (mPatient != null && mObservationFieldName != null) {
 			getObservations(mPatient.getPatientId(), mObservationFieldName);
 		}
-		
-		if (mChartView == null) {
-			LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
-			mChartView = ChartFactory.getTimeChartView(this, mDataset,
-					mRenderer, null);
-			layout.addView(mChartView, new LayoutParams(
-					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		} else {
-			mChartView.repaint();
-		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
 	}
 	
 	private void showCustomToast(String message) {

@@ -210,17 +210,31 @@ public class ViewPatientActivity extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView listView, View view, int position,
 			long id) {
-		// Get selected observation
-		Observation obs = (Observation) getListAdapter().getItem(position);
 
 		if (mPatient != null) {
-			Intent ip = new Intent(getApplicationContext(),
-					ObservationChartActivity.class);
-			ip.putExtra(Constants.KEY_PATIENT_ID, mPatient.getPatientId()
-					.toString());
-			ip.putExtra(Constants.KEY_OBSERVATION_FIELD_NAME, obs
-					.getFieldName());
-			startActivity(ip);
+			// Get selected observation
+			Observation obs = (Observation) getListAdapter().getItem(position);
+			
+			Intent ip;
+			int dataType = obs.getDataType();
+			if (dataType == Constants.TYPE_INT
+					|| dataType == Constants.TYPE_FLOAT) {
+				ip = new Intent(getApplicationContext(),
+						ObservationChartActivity.class);
+				ip.putExtra(Constants.KEY_PATIENT_ID, mPatient.getPatientId()
+						.toString());
+				ip.putExtra(Constants.KEY_OBSERVATION_FIELD_NAME, obs
+						.getFieldName());
+				startActivity(ip);
+			} else {
+				ip = new Intent(getApplicationContext(),
+						ObservationTimelineActivity.class);
+				ip.putExtra(Constants.KEY_PATIENT_ID, mPatient.getPatientId()
+						.toString());
+				ip.putExtra(Constants.KEY_OBSERVATION_FIELD_NAME, obs
+						.getFieldName());
+				startActivity(ip);
+			}
 		}
 	}
 	

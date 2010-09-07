@@ -14,11 +14,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class ObservationAdapter extends ArrayAdapter<Observation> {
+public class EncounterAdapter extends ArrayAdapter<Observation> {
 
 	private SimpleDateFormat mDateFormat = new SimpleDateFormat("MMM dd, yyyy");
 
-	public ObservationAdapter(Context context, int textViewResourceId,
+	public EncounterAdapter(Context context, int textViewResourceId,
 			List<Observation> items) {
 		super(context, textViewResourceId, items);
 	}
@@ -28,18 +28,13 @@ public class ObservationAdapter extends ArrayAdapter<Observation> {
 		if (v == null) {
 			LayoutInflater vi = (LayoutInflater) getContext()
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			v = vi.inflate(R.layout.observation_list_item, null);
+			v = vi.inflate(R.layout.encounter_list_item, null);
 		}
 		
 		Observation obs = getItem(position);
 		if (obs != null) {
 
-			TextView textView = (TextView) v.findViewById(R.id.fieldname_text);
-			if (textView != null) {
-				textView.setText(obs.getFieldName());
-			}
-
-			textView = (TextView) v.findViewById(R.id.value_text);
+			TextView textView = (TextView) v.findViewById(R.id.value_text);
 			if (textView != null) {
 				switch (obs.getDataType()) {
 				case Constants.TYPE_INT:
