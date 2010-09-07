@@ -203,7 +203,7 @@ public class ClinicAdapter {
 	public boolean deleteAllCohorts() {
 		return mDb.delete(COHORTS_TABLE, null, null) > 0;
 	}
-
+	
 	/**
 	 * Get a cursor to multiple patients from the database.
 	 * 
@@ -269,6 +269,19 @@ public class ClinicAdapter {
 		return c;
 	}
 
+	public Cursor fetchPatient(Integer patientId) throws SQLException {
+		Cursor c = null;
+		c = mDb.query(true, PATIENTS_TABLE, new String[] { KEY_ID,
+				KEY_PATIENT_ID, KEY_IDENTIFIER, KEY_GIVEN_NAME,
+				KEY_FAMILY_NAME, KEY_MIDDLE_NAME, KEY_BIRTH_DATE, KEY_GENDER },
+				KEY_PATIENT_ID + "=" + patientId, null, null, null, null, null);
+
+		if (c != null) {
+			c.moveToFirst();
+		}
+		return c;
+	}
+	
 	public Cursor fetchAllPatients() throws SQLException {
 		Cursor c = null;
 		c = mDb.query(true, PATIENTS_TABLE, new String[] { KEY_ID,
@@ -317,7 +330,7 @@ public class ClinicAdapter {
 		cv.put(KEY_GENDER, patient.getGender());
 
 		return mDb.update(PATIENTS_TABLE, cv, KEY_PATIENT_ID + "='"
-				+ patient.getPatientId().toString() + "'", null) > 0;
+				+ patient.getPatientId() + "'", null) > 0;
 	}
 
 	public static boolean createStorage() {
@@ -346,17 +359,35 @@ public class ClinicAdapter {
 		}
 	}
 
-	public Cursor fetchPatientObservations(String patientId) throws SQLException {
+	public Cursor fetchPatientObservations(Integer patientId) throws SQLException {
 		Cursor c = null;
-		
-		c = mDb.query(OBSERVATIONS_TABLE, new String[] {KEY_VALUE_TEXT, KEY_VALUE_TEXT, KEY_DATA_TYPE,
-				KEY_VALUE_NUMERIC, KEY_VALUE_DATE, KEY_VALUE_INT, KEY_FIELD_NAME, KEY_ENCOUNTER_DATE},
-				KEY_PATIENT_ID + "=" + patientId, null, null, null, 
+		// TODO removing an extra KEY_VALUE_TEXT doesn't screw things up?
+		c = mDb.query(OBSERVATIONS_TABLE, new String[] { KEY_VALUE_TEXT,
+				KEY_DATA_TYPE, KEY_VALUE_NUMERIC, KEY_VALUE_DATE,
+				KEY_VALUE_INT, KEY_FIELD_NAME, KEY_ENCOUNTER_DATE },
+				KEY_PATIENT_ID + "=" + patientId, null, null, null,
 				KEY_FIELD_NAME + "," + KEY_ENCOUNTER_DATE + " desc");
-		
-		if(c != null)
+
+		if (c != null)
 			c.moveToFirst();
-		
+
+		return c;
+	}
+	
+	public Cursor fetchPatientObservation(Integer patientId, String fieldName)
+			throws SQLException {
+		Cursor c = null;
+
+		c = mDb.query(OBSERVATIONS_TABLE, new String[] { KEY_VALUE_TEXT,
+				KEY_DATA_TYPE, KEY_VALUE_NUMERIC, KEY_VALUE_DATE,
+				KEY_VALUE_INT, KEY_ENCOUNTER_DATE },
+				KEY_PATIENT_ID + "=" + patientId + " AND " + KEY_FIELD_NAME
+						+ "='" + fieldName + "'", null, null, null,
+				KEY_ENCOUNTER_DATE + " desc");
+
+		if (c != null)
+			c.moveToFirst();
+
 		return c;
 	}
 }

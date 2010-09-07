@@ -117,16 +117,9 @@ public class ListPatientActivity extends ListActivity {
 		Patient p = (Patient) getListAdapter().getItem(position);
 		String patientIdStr = p.getPatientId().toString();
 
-		// create intent for return and store path
-		Intent i = new Intent();
-		i.putExtra("SCAN_RESULT", patientIdStr);
-		setResult(RESULT_OK, i);
-
 		Intent ip = new Intent(getApplicationContext(),
-				ShowPatientActivity.class);
+				ViewPatientActivity.class);
 		ip.putExtra(Constants.KEY_PATIENT_ID, patientIdStr);
-		ip.putExtra(Constants.KEY_PATIENT_NAME, p.getName());
-		ip.putExtra(Constants.KEY_PATIENT_IDENTIFIER, p.getIdentifier());
 		startActivity(ip);
 	}
 
@@ -180,15 +173,15 @@ public class ListPatientActivity extends ListActivity {
 
 	private void getPatients(String searchStr) {
 
-		ClinicAdapter pda = new ClinicAdapter();
+		ClinicAdapter ca = new ClinicAdapter();
 		DateFormat mdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-		pda.open();
+		ca.open();
 		Cursor c = null;
 		if (searchStr != null) {
-			c = pda.fetchPatients(searchStr, searchStr);
+			c = ca.fetchPatients(searchStr, searchStr);
 		} else {
-			c = pda.fetchAllPatients();
+			c = ca.fetchAllPatients();
 		}
 
 		if (c != null && c.getCount() >= 0) {
@@ -209,8 +202,9 @@ public class ListPatientActivity extends ListActivity {
 					.getColumnIndex(ClinicAdapter.KEY_BIRTH_DATE);
 			int genderIndex = c.getColumnIndex(ClinicAdapter.KEY_GENDER);
 
-			Patient p;
 			if (c.getCount() > 0) {
+				
+				Patient p;
 				do {
 					p = new Patient();
 					p.setPatientId(c.getInt(patientIdIndex));
@@ -235,7 +229,7 @@ public class ListPatientActivity extends ListActivity {
 		if (c != null) {
 			c.close();
 		}
-		pda.close();
+		ca.close();
 
 	}
 

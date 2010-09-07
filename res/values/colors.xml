@@ -29,4 +29,5 @@ the License.
 	<drawable name="white">#ffffffff</drawable>
 	<drawable name="yellow">#77ffff00</drawable>
 
+<color name="chart_red">#d96666</color>
 </resources>

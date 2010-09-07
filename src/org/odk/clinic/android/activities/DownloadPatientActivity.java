@@ -119,10 +119,10 @@ public class DownloadPatientActivity extends Activity implements
 	
 	private void getCohorts() {
 
-		ClinicAdapter pda = new ClinicAdapter();
+		ClinicAdapter ca = new ClinicAdapter();
 
-		pda.open();
-		Cursor c = pda.fetchAllCohorts();
+		ca.open();
+		Cursor c = ca.fetchAllCohorts();
 
 		if (c != null && c.getCount() >= 0) {
 
@@ -147,7 +147,7 @@ public class DownloadPatientActivity extends Activity implements
 		if (c != null)
 			c.close();
 
-		pda.close();
+		ca.close();
 
 	}
 
