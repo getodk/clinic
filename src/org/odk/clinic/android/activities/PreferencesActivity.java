@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
 
+//TODO when you change servers, you should wipe the cohort list.
+
 public class PreferencesActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
 
