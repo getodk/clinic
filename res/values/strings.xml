@@ -33,8 +33,8 @@ the License.
 <string name="find_patient">List Patients</string>
 <string name="go_back">Go Back</string>
 <string name="info">ODK Clinic</string>
-<string name="no_cohort">No cohorts found.</string>
-<string name="no_items">No patients found.</string>
+<string name="no_cohort">No cohorts. Try refreshing.</string>
+<string name="no_items">No patients. Change Settings and Download Patients using the Menu button.</string>
 <string name="odk">Open Data Kit</string>
 <string name="openmrs">OpenMRS</string>
 <string name="password">Password</string>
@@ -49,4 +49,7 @@ the License.
 <string name="download">Download</string>
 <string name="refresh">Refresh</string>
 <string name="cancel">Cancel</string>
+<string name="view_patient">View Patient</string>
+<string name="view_patient_detail">View Observation</string>
+
 </resources>

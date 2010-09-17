@@ -50,7 +50,7 @@ public class ObservationTimelineActivity extends ListActivity {
 		mObservationFieldName = getIntent().getStringExtra(Constants.KEY_OBSERVATION_FIELD_NAME);
 		
 		setTitle(getString(R.string.app_name) + " > "
-				+ mPatient.getName() + " > " + mObservationFieldName);
+				+ getString(R.string.view_patient_detail));
 		
 		TextView textView = (TextView) findViewById(R.id.title_text);
 		if (textView != null) {

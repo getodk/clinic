@@ -20,8 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:paddingRight="8dip"
-            android:textStyle="bold"
-            android:textSize="12sp"
+            android:textSize="14sp"
         />
             
         <TextView
@@ -45,9 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:textStyle="bold"
-            android:textSize="22sp"
-            android:ellipsize="end"
-            android:singleLine="true"
+            android:textSize="18sp"
+
             android:paddingLeft="8dip"
         />
     

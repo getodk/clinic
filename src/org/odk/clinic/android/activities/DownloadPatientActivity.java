@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 // TODO Merge this activity into FindPatientActivity
+// TODO when the screen sleeps, dialog goes away
 
 public class DownloadPatientActivity extends Activity implements
 		DownloadListener {

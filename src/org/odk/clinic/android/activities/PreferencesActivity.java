@@ -1,14 +1,13 @@
 package org.odk.clinic.android.activities;
 
 import org.odk.clinic.android.R;
+import org.odk.clinic.android.database.ClinicAdapter;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
-
-//TODO when you change servers, you should wipe the cohort list.
 
 public class PreferencesActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
@@ -17,7 +16,8 @@ public class PreferencesActivity extends PreferenceActivity implements
 	public static String KEY_USERNAME = "username";
 	public static String KEY_PASSWORD = "password";
 	public static String KEY_COHORT = "cohort";
-	
+	private ClinicAdapter mPatientDbAdapter = new ClinicAdapter();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -63,6 +63,11 @@ public class PreferencesActivity extends PreferenceActivity implements
 			s = s.substring(0, s.lastIndexOf("/"));
 		}
 		etp.setSummary(s);
+		
+		//when you change servers, you should wipe the cohort list.
+		mPatientDbAdapter.open();
+		mPatientDbAdapter.deleteAllCohorts();	
+		mPatientDbAdapter.close();
 
 	}
 
@@ -78,5 +83,5 @@ public class PreferencesActivity extends PreferenceActivity implements
 		etp.setSummary(etp.getText().replaceAll(".", "*"));
 
 	}
-
+	
 }

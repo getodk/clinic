@@ -26,6 +26,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+// TODO if no obs, don't crash when viewing patients
+
 public class ViewPatientActivity extends ListActivity {
 
 	private Patient mPatient;
@@ -50,7 +53,7 @@ public class ViewPatientActivity extends ListActivity {
 		mPatient = getPatient(patientId);
 		
 		setTitle(getString(R.string.app_name) + " > "
-				+ mPatient.getName() + " - " + mPatient.getIdentifier());
+				+ getString(R.string.view_patient));
 		
 		View patientView = (View) findViewById(R.id.patient_info);
 		patientView.setBackgroundResource(R.drawable.search_gradient);
@@ -207,6 +210,8 @@ public class ViewPatientActivity extends ListActivity {
 		ca.close();
 	}
 	
+	//TODO on long press, graph
+	//TODO if you have only one value, don't display next level
 	@Override
 	protected void onListItemClick(ListView listView, View view, int position,
 			long id) {
