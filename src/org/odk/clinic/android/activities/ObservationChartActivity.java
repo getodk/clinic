@@ -74,7 +74,10 @@ public class ObservationChartActivity extends Activity {
 		mRenderer.addSeriesRenderer(r);
 		mRenderer.setShowLegend(false);
 		//mRenderer.setXTitle("Encounter Date");
-		mRenderer.setAxisTitleTextSize(14.0f);
+		//mRenderer.setAxisTitleTextSize(18.0f);
+		mRenderer.setLabelsTextSize(11.0f);
+		//mRenderer.setXLabels(10);
+		mRenderer.setShowGrid(true);
 		mRenderer.setLabelsColor(getResources().getColor(android.R.color.black));
 	}
 	
