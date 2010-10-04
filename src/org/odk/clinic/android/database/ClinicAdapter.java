@@ -54,7 +54,7 @@ public class ClinicAdapter {
 	private static final String COHORTS_TABLE = "cohorts";
 	private static final int DATABASE_VERSION = 6;
 	private static final String DATABASE_PATH = Environment
-			.getExternalStorageDirectory() + "/clinic";
+			.getExternalStorageDirectory() + "/odk/databases/";
 
 	private static final String CREATE_PATIENTS_TABLE = "create table "
 			+ PATIENTS_TABLE + " (_id integer primary key autoincrement, "
