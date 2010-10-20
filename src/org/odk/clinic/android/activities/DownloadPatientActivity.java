@@ -28,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 // TODO Merge this activity into FindPatientActivity
-// TODO when the screen sleeps, dialog goes away
 
 public class DownloadPatientActivity extends Activity implements
 		DownloadListener {
@@ -53,6 +52,7 @@ public class DownloadPatientActivity extends Activity implements
 
 		if (!ClinicAdapter.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
+			setResult(RESULT_CANCELED);
 			finish();
 		}
 		
@@ -151,62 +151,56 @@ public class DownloadPatientActivity extends Activity implements
 		ca.close();
 
 	}
+    
+    private class CohortDialogListener implements
+            DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
+        
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            
+            if (which > 0) {
+                Cohort c = mCohorts.get(which);
+                
+                SharedPreferences settings = PreferenceManager
+                        .getDefaultSharedPreferences(getBaseContext());
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putInt(PreferencesActivity.KEY_COHORT, c.getCohortId().intValue());
+                editor.commit();
+            } else {
+                // Remove dialog to get a fresh instance next time we call showDialog()
+                removeDialog(COHORT_DIALOG);
+                mCohortDialog = null;
+                
+                switch (which) {
+                    case DialogInterface.BUTTON_NEUTRAL: // refresh
+                        downloadCohorts();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE: // cancel
+                        setResult(RESULT_CANCELED);
+                        finish();
+                        break;
+                    case DialogInterface.BUTTON_POSITIVE: // download
+                        downloadPatients();
+                        break;
+                }
+            }
+        }
+        
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            setResult(RESULT_CANCELED);
+            finish();
+        }
+    }
 
-	//TODO: combine into one button listener
 	private AlertDialog createCohortDialog() {
-		
-		DialogInterface.OnClickListener refreshButtonListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// Remove dialog to get a fresh instance next time we call showDialog()
-				removeDialog(COHORT_DIALOG);
-				mCohortDialog = null;
-				downloadCohorts();
-			}
-		};
-		
-		DialogInterface.OnClickListener okayButtonListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				removeDialog(COHORT_DIALOG);
-				mCohortDialog = null;
-				downloadPatients();
-			}
-		};
-		
-		DialogInterface.OnClickListener backButtonListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				removeDialog(COHORT_DIALOG);
-				mCohortDialog = null;
-				finish();
-			}
-		};
-		
-		DialogInterface.OnClickListener itemClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				Cohort c = mCohorts.get(which);
-				
-				SharedPreferences settings = PreferenceManager
-						.getDefaultSharedPreferences(getBaseContext());
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putInt(PreferencesActivity.KEY_COHORT, c.getCohortId().intValue());
-				editor.commit();
-			}
-		};
-		
-		DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
-			@Override
-			public void onCancel(DialogInterface arg0) {
-				finish();
-			}
-		};
 		
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getBaseContext());
 		int cohortId = settings.getInt(PreferencesActivity.KEY_COHORT, -1);
 
+		CohortDialogListener listener = new CohortDialogListener();
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.select_cohort));
 
@@ -221,15 +215,14 @@ public class DownloadPatientActivity extends Activity implements
 					selectedCohortIndex = i;
 				}
 			}
-			builder.setSingleChoiceItems(cohortNames, selectedCohortIndex,
-					itemClickListener);
-			builder.setPositiveButton(getString(R.string.download), okayButtonListener);
+			builder.setSingleChoiceItems(cohortNames, selectedCohortIndex, listener);
+			builder.setPositiveButton(getString(R.string.download), listener);
 		} else {
 			builder.setMessage(getString(R.string.no_cohort));
 		}
-		builder.setNeutralButton(getString(R.string.refresh), refreshButtonListener);
-		builder.setNegativeButton(getString(R.string.cancel), backButtonListener);
-		builder.setOnCancelListener(cancelListener);
+		builder.setNeutralButton(getString(R.string.refresh), listener);
+		builder.setNegativeButton(getString(R.string.cancel), listener);
+		builder.setOnCancelListener(listener);
 
 		return builder.create();
 	}
@@ -242,6 +235,7 @@ public class DownloadPatientActivity extends Activity implements
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
 				mDownloadTask.setServerConnectionListener(null);
+				setResult(RESULT_CANCELED);
 				finish();
 			}
 		};
@@ -293,6 +287,7 @@ public class DownloadPatientActivity extends Activity implements
 			showDialog(COHORT_DIALOG);
 			
 		} else {
+		    setResult(RESULT_OK);
 			finish();
 		}
 		
@@ -321,21 +316,30 @@ public class DownloadPatientActivity extends Activity implements
 
 	@Override
 	protected void onResume() {
+	    super.onResume();
+	    
 		if (mDownloadTask != null) {
 			mDownloadTask.setServerConnectionListener(this);
 		}
-		super.onResume();
+		
+		if (mCohortDialog != null && !mCohortDialog.isShowing()) {
+		    mCohortDialog.show();
+		}
+		if (mProgressDialog != null && !mProgressDialog.isShowing()) {
+            mProgressDialog.show();
+        }
 	}
 
 	@Override
 	protected void onPause() {
+	    super.onPause();
+	    
 		if (mCohortDialog != null && mCohortDialog.isShowing()) {
 			mCohortDialog.dismiss();
 		}
 		if (mProgressDialog != null && mProgressDialog.isShowing()) {
 			mProgressDialog.dismiss();
 		}
-		super.onPause();
 	}
 
 	private void showCustomToast(String message) {

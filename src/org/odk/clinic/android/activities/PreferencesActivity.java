@@ -15,7 +15,10 @@ public class PreferencesActivity extends PreferenceActivity implements
 	public static String KEY_SERVER = "server";
 	public static String KEY_USERNAME = "username";
 	public static String KEY_PASSWORD = "password";
+	
 	public static String KEY_COHORT = "cohort";
+	public static String KEY_FIRST_RUN = "firstRun";
+	
 	private ClinicAdapter mPatientDbAdapter = new ClinicAdapter();
 
 	@Override

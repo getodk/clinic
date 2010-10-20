@@ -15,8 +15,10 @@ import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -38,9 +40,15 @@ import android.widget.Toast;
 
 public class ListPatientActivity extends ListActivity {
 
+    // Menu ID's
 	private static final int MENU_DOWNLOAD = Menu.FIRST;
 	private static final int MENU_PREFERENCES = MENU_DOWNLOAD + 1;
+	
+	// Request codes
+	public static final int DOWNLOAD_PATIENT = 1;
 	public static final int BARCODE_CAPTURE = 2;
+	
+	private static final String DOWNLOAD_PATIENT_CANCELED_KEY = "downloadPatientCanceled";
 
 	private ImageButton mBarcodeButton;
 	private EditText mSearchText;
@@ -48,6 +56,7 @@ public class ListPatientActivity extends ListActivity {
 
 	private ArrayAdapter<Patient> mPatientAdapter;
 	private ArrayList<Patient> mPatients = new ArrayList<Patient>();
+	private boolean mDownloadPatientCanceled = false;
 
 	/*
 	 * (non-Javadoc)
@@ -59,6 +68,12 @@ public class ListPatientActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		if (savedInstanceState != null) {
+		    if (savedInstanceState.containsKey(DOWNLOAD_PATIENT_CANCELED_KEY)) {
+		        mDownloadPatientCanceled = savedInstanceState.getBoolean(DOWNLOAD_PATIENT_CANCELED_KEY);
+		    }
+		}
+		
 		setContentView(R.layout.find_patient);
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.find_patient));
@@ -139,7 +154,7 @@ public class ListPatientActivity extends ListActivity {
 		case MENU_DOWNLOAD:
 			Intent id = new Intent(getApplicationContext(),
 					DownloadPatientActivity.class);
-			startActivity(id);
+			startActivityForResult(id, DOWNLOAD_PATIENT);
 			return true;
 		case MENU_PREFERENCES:
 			Intent ip = new Intent(getApplicationContext(),
@@ -153,7 +168,11 @@ public class ListPatientActivity extends ListActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
+	    
 		if (resultCode == RESULT_CANCELED) {
+		    if (requestCode == DOWNLOAD_PATIENT) {
+		        mDownloadPatientCanceled = true;
+		    }
 			return;
 		}
 
@@ -251,10 +270,34 @@ public class ListPatientActivity extends ListActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		getPatients();
-		// hack to trigger refilter
-		mSearchText.setText(mSearchText.getText().toString());
+		
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+	    boolean firstRun = settings.getBoolean(PreferencesActivity.KEY_FIRST_RUN, true);
+	    
+		if (firstRun) {
+		    // Save first run status
+		    SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean(PreferencesActivity.KEY_FIRST_RUN, false);
+            editor.commit();
+            
+            // Start preferences activity
+		    Intent ip = new Intent(getApplicationContext(),
+                    PreferencesActivity.class);
+            startActivity(ip);
+            
+		} else {
+            getPatients();
 
+            if (mPatients.isEmpty() && !mDownloadPatientCanceled) {
+                // Download patients if no patients are in db
+                Intent id = new Intent(getApplicationContext(),
+                        DownloadPatientActivity.class);
+                startActivityForResult(id, DOWNLOAD_PATIENT);
+            } else {
+                // hack to trigger refilter
+                mSearchText.setText(mSearchText.getText().toString());
+            }
+		}
 	}
 
 	@Override
@@ -266,6 +309,8 @@ public class ListPatientActivity extends ListActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		
+		outState.putBoolean(DOWNLOAD_PATIENT_CANCELED_KEY, mDownloadPatientCanceled);
 	}
 
 	private void showCustomToast(String message) {
