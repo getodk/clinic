@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import org.odk.clinic.android.R;
 import org.odk.clinic.android.adapters.ObservationAdapter;
+import org.odk.clinic.android.application.Clinic;
 import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Observation;
@@ -19,6 +20,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -32,16 +35,22 @@ import android.widget.Toast;
 public class ViewPatientActivity extends ListActivity {
 
 	private Patient mPatient;
-	
+
 	private ArrayAdapter<Observation> mObservationAdapter;
 	private ArrayList<Observation> mObservations = new ArrayList<Observation>();
-	
+
+	// Menu ID's
+	private static final int MENU_FORMS = Menu.FIRST;
+
+	private static final int FORM_CHOOSER = 0;
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.view_patient);
-		
+
 		if (!ClinicAdapter.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
@@ -52,12 +61,14 @@ public class ViewPatientActivity extends ListActivity {
 		Integer patientId = Integer.valueOf(patientIdStr);
 		mPatient = getPatient(patientId);
 		
+		Clinic.getInstance().setSelectedPatient(mPatient);
+
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.view_patient));
-		
+
 		View patientView = (View) findViewById(R.id.patient_info);
 		patientView.setBackgroundResource(R.drawable.search_gradient);
-		
+
 		TextView textView = (TextView) findViewById(R.id.identifier_text);
 		if (textView != null) {
 			textView.setText(mPatient.getIdentifier());
@@ -90,7 +101,7 @@ public class ViewPatientActivity extends ListActivity {
 		}
 
 	}
-	
+
 	private Patient getPatient(Integer patientId) {
 
 		Patient p = null;
@@ -102,19 +113,19 @@ public class ViewPatientActivity extends ListActivity {
 
 		if (c != null && c.getCount() > 0) {
 			int patientIdIndex = c
-					.getColumnIndex(ClinicAdapter.KEY_PATIENT_ID);
+			.getColumnIndex(ClinicAdapter.KEY_PATIENT_ID);
 			int identifierIndex = c
-					.getColumnIndex(ClinicAdapter.KEY_IDENTIFIER);
+			.getColumnIndex(ClinicAdapter.KEY_IDENTIFIER);
 			int givenNameIndex = c
-					.getColumnIndex(ClinicAdapter.KEY_GIVEN_NAME);
+			.getColumnIndex(ClinicAdapter.KEY_GIVEN_NAME);
 			int familyNameIndex = c
-					.getColumnIndex(ClinicAdapter.KEY_FAMILY_NAME);
+			.getColumnIndex(ClinicAdapter.KEY_FAMILY_NAME);
 			int middleNameIndex = c
-					.getColumnIndex(ClinicAdapter.KEY_MIDDLE_NAME);
+			.getColumnIndex(ClinicAdapter.KEY_MIDDLE_NAME);
 			int birthDateIndex = c
-					.getColumnIndex(ClinicAdapter.KEY_BIRTH_DATE);
+			.getColumnIndex(ClinicAdapter.KEY_BIRTH_DATE);
 			int genderIndex = c.getColumnIndex(ClinicAdapter.KEY_GENDER);
-			
+
 			p = new Patient();
 			p.setPatientId(c.getInt(patientIdIndex));
 			p.setIdentifier(c.getString(identifierIndex));
@@ -136,18 +147,18 @@ public class ViewPatientActivity extends ListActivity {
 
 		return p;
 	}
-	
+
 	private void getAllObservations(Integer patientId) {
-		
+
 		ClinicAdapter ca = new ClinicAdapter();
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		
+
 		ca.open();
 		Cursor c = ca.fetchPatientObservations(patientId);
-		
+
 		if (c != null && c.getCount() >= 0) {
 			mObservations.clear();
-			
+
 			int valueTextIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_TEXT);
 			int valueIntIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_INT);
 			int valueDateIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_DATE);
@@ -155,15 +166,15 @@ public class ViewPatientActivity extends ListActivity {
 			int fieldNameIndex = c.getColumnIndex(ClinicAdapter.KEY_FIELD_NAME);
 			int encounterDateIndex = c.getColumnIndex(ClinicAdapter.KEY_ENCOUNTER_DATE);
 			int dataTypeIndex = c.getColumnIndex(ClinicAdapter.KEY_DATA_TYPE);
-			
+
 			Observation obs;
 			String prevFieldName = null;
 			do {
 				String fieldName = c.getString(fieldNameIndex);
-				
+
 				// We only want most recent observation, so only get first observation
 				if (!fieldName.equals(prevFieldName)) {
-					
+
 					obs = new Observation();
 					obs.setFieldName(fieldName);
 					try {
@@ -201,7 +212,7 @@ public class ViewPatientActivity extends ListActivity {
 
 			} while(c.moveToNext());
 		}
-		
+
 		refreshView();
 
 		if (c != null) {
@@ -209,7 +220,7 @@ public class ViewPatientActivity extends ListActivity {
 		}
 		ca.close();
 	}
-	
+
 	//TODO on long press, graph
 	//TODO if you have only one value, don't display next level
 	@Override
@@ -219,7 +230,7 @@ public class ViewPatientActivity extends ListActivity {
 		if (mPatient != null) {
 			// Get selected observation
 			Observation obs = (Observation) getListAdapter().getItem(position);
-			
+
 			Intent ip;
 			int dataType = obs.getDataType();
 			if (dataType == Constants.TYPE_INT
@@ -242,7 +253,7 @@ public class ViewPatientActivity extends ListActivity {
 			}
 		}
 	}
-	
+
 	private void refreshView() {
 
 		mObservationAdapter = new ObservationAdapter(this, R.layout.observation_list_item,
@@ -259,7 +270,7 @@ public class ViewPatientActivity extends ListActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 		if (mPatient != null) {
 			// TODO Create more efficient SQL query to get only the latest observation values
 			getAllObservations(mPatient.getPatientId());
@@ -276,7 +287,7 @@ public class ViewPatientActivity extends ListActivity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 	}
-	
+
 	private void showCustomToast(String message) {
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View view = inflater.inflate(R.layout.toast_view, null);
@@ -290,5 +301,47 @@ public class ViewPatientActivity extends ListActivity {
 		t.setDuration(Toast.LENGTH_LONG);
 		t.setGravity(Gravity.CENTER, 0, 0);
 		t.show();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		menu.add(0, MENU_FORMS, 0, getString(R.string.forms))
+		.setIcon(R.drawable.ic_menu_invite);
+
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case MENU_FORMS:
+			Intent i = new Intent(getApplicationContext(), FormChooserList.class);
+			startActivityForResult(i, FORM_CHOOSER);
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		if (resultCode == RESULT_CANCELED) {
+			return; 
+		}
+
+		String formPath = null;
+		Intent i = null;
+		switch (requestCode) {
+		// returns with a form path, start entry
+		case FORM_CHOOSER:
+			formPath = intent.getStringExtra(FormEntryActivity.KEY_FORMPATH);
+			i = new Intent("org.odk.clinic.android.action.FormEntry");
+			i.putExtra(FormEntryActivity.KEY_FORMPATH, formPath);
+			startActivity(i);
+			break;
+		}
+
+		super.onActivityResult(requestCode, resultCode, intent);
 	}
 }
