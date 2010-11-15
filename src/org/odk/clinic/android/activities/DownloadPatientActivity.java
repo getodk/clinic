@@ -158,7 +158,7 @@ public class DownloadPatientActivity extends Activity implements
         @Override
         public void onClick(DialogInterface dialog, int which) {
             
-            if (which > 0) {
+            if (which > -1) {
                 Cohort c = mCohorts.get(which);
                 
                 SharedPreferences settings = PreferenceManager
@@ -215,6 +215,7 @@ public class DownloadPatientActivity extends Activity implements
 					selectedCohortIndex = i;
 				}
 			}
+			
 			builder.setSingleChoiceItems(cohortNames, selectedCohortIndex, listener);
 			builder.setPositiveButton(getString(R.string.download), listener);
 		} else {
