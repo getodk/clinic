@@ -156,7 +156,7 @@ public class ViewPatientActivity extends ListActivity {
 		ca.open();
 		Cursor c = ca.fetchPatientObservations(patientId);
 
-		if (c != null && c.getCount() >= 0) {
+		if (c != null && c.getCount() > 0) {
 			mObservations.clear();
 
 			int valueTextIndex = c.getColumnIndex(ClinicAdapter.KEY_VALUE_TEXT);
