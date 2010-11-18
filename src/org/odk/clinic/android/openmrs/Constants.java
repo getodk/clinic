@@ -79,6 +79,9 @@ public class Constants {
 	
 	public static final String USER_DOWNLOAD_URL = "/moduleServlet/xforms/userDownload";
 
+	public static final String FORMLIST_DOWNLOAD_URL = "/moduleServlet/xforms/xformDownload?target=xformslist";
+	
+	public static final String FORM_DOWNLOAD_URL = "/moduleServlet/xforms/xformDownload?target=xform&excludeLayout=true";
 	
 
 	public static final int TYPE_STRING = 1;

@@ -19,6 +19,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -31,6 +33,9 @@ import android.widget.Toast;
 
 public class ViewPatientActivity extends ListActivity {
 
+    // Menu ID's
+    private static final int MENU_FORMS = Menu.FIRST;
+    
 	private Patient mPatient;
 	
 	private ArrayAdapter<Observation> mObservationAdapter;
@@ -210,6 +215,28 @@ public class ViewPatientActivity extends ListActivity {
 		ca.close();
 	}
 	
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        menu.add(0, MENU_FORMS, 0, getString(R.string.fill_forms))
+                .setIcon(android.R.drawable.ic_menu_edit);
+        
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case MENU_FORMS:
+                Intent ip = new Intent(getApplicationContext(),
+                        ListFormActivity.class);
+                startActivity(ip);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+	
 	//TODO on long press, graph
 	//TODO if you have only one value, don't display next level
 	@Override
@@ -291,4 +318,50 @@ public class ViewPatientActivity extends ListActivity {
 		t.setGravity(Gravity.CENTER, 0, 0);
 		t.show();
 	}
+	
+    /*
+    private void formEntry(String formpath, FormRecord r) {
+        PreloadContentProvider.initializeSession(platform, this);
+        Intent i = new Intent("org.odk.collect.android.action.FormEntry");
+        i.putExtra("formpath", formpath);
+        i.putExtra("instancedestination", CommCareApplication._().fsPath((GlobalConstants.FILE_CC_SAVED)));
+        
+        CommCareSession session = platform.getSession();
+        
+        if(r == null) {
+            
+            String caseID = session.getCaseId();
+            if(caseID == null) {
+                caseID = AndroidCommCarePlatform.ENTITY_NONE; 
+            }
+            
+            SecretKey key = CommCareApplication._().createNewSymetricKey();
+            r = new FormRecord(session.getForm(), "",caseID, FormRecord.STATUS_UNSTARTED, key.getEncoded());
+            SqlIndexedStorageUtility<FormRecord> storage =  CommCareApplication._().getStorage(FormRecord.STORAGE_KEY, FormRecord.class);
+            
+            //Make sure that there are no other unstarted definitions for this form/case, otherwise we won't be able to tell them apart unpon completion
+            Vector<Integer> ids = storage.getIDsForValues(new String[] {FormRecord.META_XMLNS, FormRecord.META_ENTITY_ID, FormRecord.META_STATUS}, new Object[] {session.getForm(),caseID, FormRecord.STATUS_UNSTARTED} );
+            for(Integer recordId : ids) {
+                storage.remove(recordId.intValue());
+            }
+            
+            try {
+                storage.write(r);
+            } catch (StorageFullException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        if(r.getPath() != "") {
+            i.putExtra("instancepath", r.getPath());
+        }
+        i.putExtra("encryptionkey", r.getAesKey());
+        i.putExtra("encryptionkeyalgo", "AES");
+        
+        String[] preloaders = new String[] {"case", PreloadContentProvider.CONTENT_URI_CASE + "/" + r.getEntityId() + "/", "meta", PreloadContentProvider.CONTENT_URI_META + "/"};
+        i.putExtra("preloadproviders",preloaders);
+
+        
+        startActivityForResult(i, MODEL_RESULT);
+    }*/
 }

@@ -160,9 +160,10 @@ public class ListPatientActivity extends ListActivity {
 			Intent ip = new Intent(getApplicationContext(),
 					PreferencesActivity.class);
 			startActivity(ip);
-
+			return true;
+		default:
+		    return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

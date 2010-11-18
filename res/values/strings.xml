@@ -52,4 +52,7 @@ the License.
 <string name="view_patient">View Patient</string>
 <string name="view_patient_detail">View Observation</string>
 
+<string name="fill_forms">Fill Forms</string>
+<string name="forms">Forms</string>
+<string name="download_forms">Download Forms</string>
 </resources>
