@@ -10,6 +10,7 @@ import org.odk.clinic.android.adapters.PatientAdapter;
 import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Patient;
+import org.odk.clinic.android.utilities.FileUtils;
 
 import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
@@ -78,7 +79,7 @@ public class ListPatientActivity extends ListActivity {
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.find_patient));
 		
-		if (!ClinicAdapter.storageReady()) {
+		if (!FileUtils.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}

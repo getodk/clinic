@@ -12,6 +12,7 @@ import org.odk.clinic.android.openmrs.Form;
 import org.odk.clinic.android.tasks.DownloadFormListTask;
 import org.odk.clinic.android.tasks.DownloadFormTask;
 import org.odk.clinic.android.tasks.DownloadTask;
+import org.odk.clinic.android.utilities.FileUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -50,7 +51,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
         setTitle(getString(R.string.app_name) + " > "
                 + getString(R.string.download_forms));
 
-        if (!ClinicAdapter.storageReady()) {
+        if (!FileUtils.storageReady()) {
             showCustomToast(getString(R.string.error, R.string.storage_error));
             setResult(RESULT_CANCELED);
             finish();

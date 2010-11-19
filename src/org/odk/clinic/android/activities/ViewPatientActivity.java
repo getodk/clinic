@@ -11,6 +11,7 @@ import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
+import org.odk.clinic.android.utilities.FileUtils;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -47,7 +48,7 @@ public class ViewPatientActivity extends ListActivity {
 
 		setContentView(R.layout.view_patient);
 		
-		if (!ClinicAdapter.storageReady()) {
+		if (!FileUtils.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}

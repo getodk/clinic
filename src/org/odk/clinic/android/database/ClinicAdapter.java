@@ -392,29 +392,7 @@ public class ClinicAdapter {
     }
 
 	public static boolean createStorage() {
-		if (storageReady()) {
-			File f = new File(FileUtils.DATABASE_PATH);
-			if (f.exists()) {
-				return true;
-			} else {
-				return f.mkdirs();
-			}
-		} else {
-			return false;
-		}
-
-	}
-
-	public static boolean storageReady() {
-		String cardstatus = Environment.getExternalStorageState();
-		if (cardstatus.equals(Environment.MEDIA_REMOVED)
-				|| cardstatus.equals(Environment.MEDIA_UNMOUNTABLE)
-				|| cardstatus.equals(Environment.MEDIA_UNMOUNTED)
-				|| cardstatus.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-			return false;
-		} else {
-			return true;
-		}
+		return FileUtils.createFolder(FileUtils.DATABASE_PATH);
 	}
 
 	public Cursor fetchPatientObservations(Integer patientId) throws SQLException {

@@ -16,6 +16,7 @@ import org.odk.clinic.android.R;
 import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Patient;
+import org.odk.clinic.android.utilities.FileUtils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -45,7 +46,7 @@ public class ObservationChartActivity extends Activity {
 
 		setContentView(R.layout.observation_chart);
 		
-		if (!ClinicAdapter.storageReady()) {
+		if (!FileUtils.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}

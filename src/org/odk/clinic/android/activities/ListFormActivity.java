@@ -44,7 +44,7 @@ public class ListFormActivity extends ListActivity {
 
         setContentView(R.layout.form_list);
         
-        if (!ClinicAdapter.storageReady()) {
+        if (!FileUtils.storageReady()) {
             showCustomToast(getString(R.string.error, R.string.storage_error));
             finish();
         }
@@ -109,13 +109,12 @@ public class ListFormActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView listView, View view, int position,
             long id) {
-        // Get selected patient
+        // Get selected form
         Form f = (Form) getListAdapter().getItem(position);
         String formPath = f.getPath();
 
         Intent i = new Intent("org.odk.collect.android.action.FormEntry");
         i.putExtra("formpath", formPath);
-        i.putExtra("instancedestination", FileUtils.INSTANCES_PATH);
         startActivityForResult(i, COLLECT_FORM);
     }
 
@@ -146,6 +145,14 @@ public class ListFormActivity extends ListActivity {
         
         if (resultCode == RESULT_CANCELED) {
             return;
+        }
+        
+        if (requestCode == COLLECT_FORM && intent != null) {
+            // TODO Update ODK collect to return saved instance path
+            String instancePath = intent.getStringExtra("instancepath");
+            if (instancePath != null && instancePath.length() > 0) {
+                // Update instance
+            }
         }
 
         super.onActivityResult(requestCode, resultCode, intent);
