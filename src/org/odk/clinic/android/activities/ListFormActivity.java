@@ -121,8 +121,8 @@ public class ListFormActivity extends ListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, MENU_DOWNLOAD, 0, getString(R.string.download_patients))
-                .setIcon(android.R.drawable.ic_menu_manage);
+        menu.add(0, MENU_DOWNLOAD, 0, getString(R.string.download_forms))
+                .setIcon(R.drawable.ic_menu_download);
         return true;
     }
 

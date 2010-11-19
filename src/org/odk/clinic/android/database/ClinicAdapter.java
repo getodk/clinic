@@ -1,6 +1,5 @@
 package org.odk.clinic.android.database;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -15,7 +14,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 import android.util.Log;
 
 public class ClinicAdapter {

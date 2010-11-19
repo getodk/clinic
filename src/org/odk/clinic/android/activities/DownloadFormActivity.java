@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,6 +124,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
         mDownloadTask = new DownloadFormTask();
         mDownloadTask.setServerConnectionListener(DownloadFormActivity.this);
         
+        Log.i("DFA", "size " + mSelectedFormIds.size());
         String[] args = new String[mSelectedFormIds.size() + 1];
         args[0] = url.toString();
         Iterator<Integer> iter = mSelectedFormIds.iterator();
@@ -200,7 +202,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
         @Override
         public void onClick(DialogInterface dialog, int which, boolean isChecked) {
             
-            if (which > 0) {
+            if (which >= 0) {
                 Form f = mForms.get(which);
                 Integer formId = f.getFormId();
                 
@@ -224,7 +226,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
         FormListDialogListener listener = new FormListDialogListener();
         
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.select_cohort));
+        builder.setTitle(getString(R.string.select_forms));
 
         if (!mForms.isEmpty()) {
             
@@ -234,13 +236,14 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
                 Form f = mForms.get(i);
                 items[i] = f.getName();
                 if (f.getPath() != null) {
+                    mSelectedFormIds.add(f.getFormId());
                     checkedItems[i] = true;
                 }
             }
             builder.setMultiChoiceItems(items, checkedItems, listener);
             builder.setPositiveButton(getString(R.string.download), listener);
         } else {
-            builder.setMessage(getString(R.string.no_cohort));
+            builder.setMessage(getString(R.string.no_form));
         }
         builder.setNeutralButton(getString(R.string.refresh), listener);
         builder.setNegativeButton(getString(R.string.cancel), listener);

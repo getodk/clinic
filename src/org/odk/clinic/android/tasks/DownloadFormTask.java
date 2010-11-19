@@ -9,6 +9,8 @@ import java.net.URL;
 
 import org.odk.clinic.android.utilities.FileUtils;
 
+import android.util.Log;
+
 public class DownloadFormTask extends DownloadTask {
 
     @Override
@@ -16,6 +18,9 @@ public class DownloadFormTask extends DownloadTask {
 
         String baseUrl = values[0];
         int count = values.length - 1;
+        
+        for (int i = 0; i < values.length; i++)
+            Log.i("XXXX", "value: " + values[i]);
 
         if (count > 0) {
             try {
@@ -28,7 +33,7 @@ public class DownloadFormTask extends DownloadTask {
                 for (int i = 1; i < values.length; i++) {
                     try {
                         String formId = values[i];
-                        publishProgress("form" + formId, Integer.valueOf(i).toString(), Integer.valueOf(count).toString());
+                        publishProgress("form " + formId, Integer.valueOf(i).toString(), Integer.valueOf(count).toString());
                         
                         StringBuilder url = new StringBuilder(baseUrl);
                         url.append("&formId=");
