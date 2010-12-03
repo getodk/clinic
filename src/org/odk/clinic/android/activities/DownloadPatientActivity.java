@@ -10,6 +10,7 @@ import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.tasks.DownloadCohortTask;
 import org.odk.clinic.android.tasks.DownloadPatientTask;
 import org.odk.clinic.android.tasks.DownloadTask;
+import org.odk.clinic.android.utilities.FileUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -50,7 +51,7 @@ public class DownloadPatientActivity extends Activity implements
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.download_patients));
 
-		if (!ClinicAdapter.storageReady()) {
+		if (!FileUtils.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			setResult(RESULT_CANCELED);
 			finish();
@@ -158,7 +159,7 @@ public class DownloadPatientActivity extends Activity implements
         @Override
         public void onClick(DialogInterface dialog, int which) {
             
-            if (which > -1) {
+            if (which > 0) {
                 Cohort c = mCohorts.get(which);
                 
                 SharedPreferences settings = PreferenceManager
@@ -215,7 +216,6 @@ public class DownloadPatientActivity extends Activity implements
 					selectedCohortIndex = i;
 				}
 			}
-			
 			builder.setSingleChoiceItems(cohortNames, selectedCohortIndex, listener);
 			builder.setPositiveButton(getString(R.string.download), listener);
 		} else {

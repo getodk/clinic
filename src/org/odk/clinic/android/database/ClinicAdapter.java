@@ -1,19 +1,19 @@
 package org.odk.clinic.android.database;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.odk.clinic.android.openmrs.Cohort;
+import org.odk.clinic.android.openmrs.Form;
 import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
+import org.odk.clinic.android.utilities.FileUtils;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 import android.util.Log;
 
 public class ClinicAdapter {
@@ -42,6 +42,11 @@ public class ClinicAdapter {
 	public static final String KEY_COHORT_ID = "cohort_id";
 	public static final String KEY_COHORT_NAME = "name";
 
+	// form columns
+	public static final String KEY_FORM_ID = "form_id";
+    public static final String KEY_FORM_NAME = "name";
+    public static final String KEY_FORM_PATH = "path";
+	
 	private DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private String mZeroDate = "0000-00-00 00:00:00";
 
@@ -52,9 +57,8 @@ public class ClinicAdapter {
 	private static final String PATIENTS_TABLE = "patients";
 	private static final String OBSERVATIONS_TABLE = "observations";
 	private static final String COHORTS_TABLE = "cohorts";
-	private static final int DATABASE_VERSION = 6;
-	private static final String DATABASE_PATH = Environment
-			.getExternalStorageDirectory() + "/odk/databases/";
+	private static final String FORMS_TABLE = "forms";
+	private static final int DATABASE_VERSION = 7;
 
 	private static final String CREATE_PATIENTS_TABLE = "create table "
 			+ PATIENTS_TABLE + " (_id integer primary key autoincrement, "
@@ -74,11 +78,16 @@ public class ClinicAdapter {
 	private static final String CREATE_COHORTS_TABLE = "create table "
 		+ COHORTS_TABLE + " (_id integer primary key autoincrement, "
 		+ KEY_COHORT_ID + " integer not null, " + KEY_COHORT_NAME + " text);";
+	
+	private static final String CREATE_FORMS_TABLE = "create table "
+	    + FORMS_TABLE + " (_id integer primary key autoincrement, "
+	    + KEY_FORM_ID + " integer not null, " 
+	    + KEY_FORM_NAME + " text, " + KEY_FORM_PATH + " text);";
 
 	private static class DatabaseHelper extends ODKSQLiteOpenHelper {
 
 		DatabaseHelper() {
-			super(DATABASE_PATH, DATABASE_NAME, null, DATABASE_VERSION);
+			super(FileUtils.DATABASE_PATH, DATABASE_NAME, null, DATABASE_VERSION);
 			createStorage();
 		}
 
@@ -87,6 +96,7 @@ public class ClinicAdapter {
 			db.execSQL(CREATE_PATIENTS_TABLE);
 			db.execSQL(CREATE_OBSERVATIONS_TABLE);
 			db.execSQL(CREATE_COHORTS_TABLE);
+			db.execSQL(CREATE_FORMS_TABLE);
 		}
 
 		@Override
@@ -95,6 +105,7 @@ public class ClinicAdapter {
 			db.execSQL("DROP TABLE IF EXISTS " + PATIENTS_TABLE);
 			db.execSQL("DROP TABLE IF EXISTS " + OBSERVATIONS_TABLE);
 			db.execSQL("DROP TABLE IF EXISTS " + COHORTS_TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + FORMS_TABLE);
 			onCreate(db);
 		}
 	}
@@ -109,6 +120,8 @@ public class ClinicAdapter {
 		mDbHelper.close();
 	}
 
+	// TODO Remove the need to pass in Patient/Observation objects. Saves object creation
+	
 	/**
 	 * Insert patient into the database.
 	 * 
@@ -186,6 +199,23 @@ public class ClinicAdapter {
 
 		return id;
 	}
+	
+	public long createForm(Form form) {
+	    ContentValues cv = new ContentValues();
+
+	    cv.put(KEY_FORM_ID, form.getFormId());
+	    cv.put(KEY_FORM_NAME, form.getName());
+	    cv.put(KEY_FORM_PATH, form.getPath());
+
+	    long id = -1;
+	    try {
+	        id = mDb.insert(FORMS_TABLE, null, cv);
+	    } catch (SQLiteConstraintException e) {
+	        Log.e(t, "Caught SQLiteConstraitException: " + e);
+	    }
+
+	    return id;
+	}
 
 	/**
 	 * Remove all patients from the database.
@@ -202,6 +232,10 @@ public class ClinicAdapter {
 	
 	public boolean deleteAllCohorts() {
 		return mDb.delete(COHORTS_TABLE, null, null) > 0;
+	}
+	
+	public boolean deleteAllForms() {
+	    return mDb.delete(FORMS_TABLE, null, null) > 0;
 	}
 	
 	/**
@@ -307,6 +341,18 @@ public class ClinicAdapter {
 		return c;
 	}
 
+    public Cursor fetchAllForms() throws SQLException {
+        Cursor c = null;
+        c = mDb.query(true, FORMS_TABLE, new String[] { KEY_ID,
+                KEY_FORM_ID, KEY_FORM_NAME, KEY_FORM_PATH },
+                null, null, null, null, null, null);
+
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
+    }
+
 	/**
 	 * Update patient in the database.
 	 * 
@@ -332,31 +378,19 @@ public class ClinicAdapter {
 		return mDb.update(PATIENTS_TABLE, cv, KEY_PATIENT_ID + "='"
 				+ patient.getPatientId() + "'", null) > 0;
 	}
+	
+    public boolean updateFormPath(Integer formId, String path) {
+        ContentValues cv = new ContentValues();
+
+        cv.put(KEY_FORM_ID, formId);
+        cv.put(KEY_FORM_PATH, path);
+
+        return mDb.update(FORMS_TABLE, cv, KEY_FORM_ID + "='"
+                + formId.toString() + "'", null) > 0;
+    }
 
 	public static boolean createStorage() {
-		if (storageReady()) {
-			File f = new File(DATABASE_PATH);
-			if (f.exists()) {
-				return true;
-			} else {
-				return f.mkdirs();
-			}
-		} else {
-			return false;
-		}
-
-	}
-
-	public static boolean storageReady() {
-		String cardstatus = Environment.getExternalStorageState();
-		if (cardstatus.equals(Environment.MEDIA_REMOVED)
-				|| cardstatus.equals(Environment.MEDIA_UNMOUNTABLE)
-				|| cardstatus.equals(Environment.MEDIA_UNMOUNTED)
-				|| cardstatus.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-			return false;
-		} else {
-			return true;
-		}
+		return FileUtils.createFolder(FileUtils.DATABASE_PATH);
 	}
 
 	public Cursor fetchPatientObservations(Integer patientId) throws SQLException {

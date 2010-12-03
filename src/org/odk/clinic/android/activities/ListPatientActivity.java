@@ -10,6 +10,7 @@ import org.odk.clinic.android.adapters.PatientAdapter;
 import org.odk.clinic.android.database.ClinicAdapter;
 import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Patient;
+import org.odk.clinic.android.utilities.FileUtils;
 
 import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
@@ -41,9 +42,8 @@ import android.widget.Toast;
 public class ListPatientActivity extends ListActivity {
 
     // Menu ID's
-	private static final int MENU_DOWNLOAD_PATIENTS = Menu.FIRST;
-	private static final int MENU_MANAGE_FORMS = MENU_DOWNLOAD_PATIENTS + 1;
-	private static final int MENU_PREFERENCES = MENU_MANAGE_FORMS + 2;
+	private static final int MENU_DOWNLOAD = Menu.FIRST;
+	private static final int MENU_PREFERENCES = MENU_DOWNLOAD + 1;
 	
 	// Request codes
 	public static final int DOWNLOAD_PATIENT = 1;
@@ -79,7 +79,7 @@ public class ListPatientActivity extends ListActivity {
 		setTitle(getString(R.string.app_name) + " > "
 				+ getString(R.string.find_patient));
 		
-		if (!ClinicAdapter.storageReady()) {
+		if (!FileUtils.storageReady()) {
 			showCustomToast(getString(R.string.error, R.string.storage_error));
 			finish();
 		}
@@ -142,9 +142,7 @@ public class ListPatientActivity extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		menu.add(0, MENU_DOWNLOAD_PATIENTS, 0, getString(R.string.download_patients))
-				.setIcon(R.drawable.ic_menu_invite);
-		menu.add(0, MENU_MANAGE_FORMS, 0, getString(R.string.manage_forms))
+		menu.add(0, MENU_DOWNLOAD, 0, getString(R.string.download_patients))
 				.setIcon(R.drawable.ic_menu_invite);
 		menu.add(0, MENU_PREFERENCES, 0, getString(R.string.server_preferences))
 				.setIcon(android.R.drawable.ic_menu_preferences);
@@ -154,22 +152,19 @@ public class ListPatientActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case MENU_DOWNLOAD_PATIENTS:
+		case MENU_DOWNLOAD:
 			Intent id = new Intent(getApplicationContext(),
 					DownloadPatientActivity.class);
 			startActivityForResult(id, DOWNLOAD_PATIENT);
 			return true;
-		case MENU_MANAGE_FORMS:
-			Intent ip = new Intent(getApplicationContext(),
-					FileManagerTabs.class);
-			startActivity(ip);
-			return true;
 		case MENU_PREFERENCES:
-			ip = new Intent(getApplicationContext(),
+			Intent ip = new Intent(getApplicationContext(),
 					PreferencesActivity.class);
 			startActivity(ip);
+			return true;
+		default:
+		    return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
