@@ -5,6 +5,5 @@
 	<classpathentry kind="lib" path="lib/jzlib-1.0.7.jar"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="lib" path="lib/achartengine-0.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/javarosa-libraries.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
