@@ -89,7 +89,7 @@ public class DownloadPatientActivity extends Activity implements
 
 		mDownloadTask = new DownloadCohortTask();
 		mDownloadTask
-				.setServerConnectionListener(DownloadPatientActivity.this);
+				.setDownloadListener(DownloadPatientActivity.this);
 		mDownloadTask.execute(url, username, password);
 	}
 	
@@ -114,7 +114,7 @@ public class DownloadPatientActivity extends Activity implements
 		int cohortId = settings.getInt(PreferencesActivity.KEY_COHORT, -1);
 
 		mDownloadTask = new DownloadPatientTask();
-		mDownloadTask.setServerConnectionListener(DownloadPatientActivity.this);
+		mDownloadTask.setDownloadListener(DownloadPatientActivity.this);
 		mDownloadTask.execute(url, username, password, Integer
 				.toString(cohortId));
 	}
@@ -235,7 +235,7 @@ public class DownloadPatientActivity extends Activity implements
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
-				mDownloadTask.setServerConnectionListener(null);
+				mDownloadTask.setDownloadListener(null);
 				setResult(RESULT_CANCELED);
 				finish();
 			}
@@ -310,7 +310,7 @@ public class DownloadPatientActivity extends Activity implements
 	@Override
 	protected void onDestroy() {
 		if (mDownloadTask != null) {
-			mDownloadTask.setServerConnectionListener(null);
+			mDownloadTask.setDownloadListener(null);
 		}
 		super.onDestroy();
 	}
@@ -320,7 +320,7 @@ public class DownloadPatientActivity extends Activity implements
 	    super.onResume();
 	    
 		if (mDownloadTask != null) {
-			mDownloadTask.setServerConnectionListener(this);
+			mDownloadTask.setDownloadListener(this);
 		}
 		
 		if (mCohortDialog != null && !mCohortDialog.isShowing()) {

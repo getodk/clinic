@@ -93,7 +93,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
 
         mDownloadTask = new DownloadFormListTask();
         mDownloadTask
-                .setServerConnectionListener(DownloadFormActivity.this);
+                .setDownloadListener(DownloadFormActivity.this);
         mDownloadTask.execute(url.toString());
     }
     
@@ -122,7 +122,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
                 getString(R.string.default_password)));
 
         mDownloadTask = new DownloadFormTask();
-        mDownloadTask.setServerConnectionListener(DownloadFormActivity.this);
+        mDownloadTask.setDownloadListener(DownloadFormActivity.this);
         
         Log.i("DFA", "size " + mSelectedFormIds.size());
         String[] args = new String[mSelectedFormIds.size() + 1];
@@ -259,7 +259,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                mDownloadTask.setServerConnectionListener(null);
+                mDownloadTask.setDownloadListener(null);
                 setResult(RESULT_CANCELED);
                 finish();
             }
@@ -334,7 +334,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
     @Override
     protected void onDestroy() {
         if (mDownloadTask != null) {
-            mDownloadTask.setServerConnectionListener(null);
+            mDownloadTask.setDownloadListener(null);
         }
         super.onDestroy();
     }
@@ -344,7 +344,7 @@ public class DownloadFormActivity extends Activity implements DownloadListener {
         super.onResume();
         
         if (mDownloadTask != null) {
-            mDownloadTask.setServerConnectionListener(this);
+            mDownloadTask.setDownloadListener(this);
         }
         
         if (mFormListDialog != null && !mFormListDialog.isShowing()) {

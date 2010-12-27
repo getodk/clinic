@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 
 import org.odk.clinic.android.openmrs.Cohort;
 import org.odk.clinic.android.openmrs.Form;
+import org.odk.clinic.android.openmrs.FormInstance;
 import org.odk.clinic.android.openmrs.Observation;
 import org.odk.clinic.android.openmrs.Patient;
 import org.odk.clinic.android.utilities.FileUtils;
@@ -46,6 +47,14 @@ public class ClinicAdapter {
 	public static final String KEY_FORM_ID = "form_id";
     public static final String KEY_FORM_NAME = "name";
     public static final String KEY_FORM_PATH = "path";
+    
+    // instance columns
+    public static final String KEY_FORMINSTANCE_STATUS = "status";
+    public static final String KEY_FORMINSTANCE_PATH = "path";
+    
+    // status for instances
+    public static final String STATUS_INITIALIZED = "initialized";
+    public static final String STATUS_SUBMITTED = "submitted";
 	
 	private DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private String mZeroDate = "0000-00-00 00:00:00";
@@ -58,7 +67,8 @@ public class ClinicAdapter {
 	private static final String OBSERVATIONS_TABLE = "observations";
 	private static final String COHORTS_TABLE = "cohorts";
 	private static final String FORMS_TABLE = "forms";
-	private static final int DATABASE_VERSION = 7;
+	private static final String FORMINSTANCES_TABLE = "instances";
+	private static final int DATABASE_VERSION = 8;
 
 	private static final String CREATE_PATIENTS_TABLE = "create table "
 			+ PATIENTS_TABLE + " (_id integer primary key autoincrement, "
@@ -84,6 +94,12 @@ public class ClinicAdapter {
 	    + KEY_FORM_ID + " integer not null, " 
 	    + KEY_FORM_NAME + " text, " + KEY_FORM_PATH + " text);";
 
+	private static final String CREATE_FORMINSTANCES_TABLE = "create table "
+        + FORMINSTANCES_TABLE + " (_id integer primary key autoincrement, "
+        + KEY_PATIENT_ID + " integer not null, "
+        + KEY_FORM_ID + " integer not null, " 
+        + KEY_FORMINSTANCE_STATUS + " text, " + KEY_FORMINSTANCE_PATH + " text);";
+
 	private static class DatabaseHelper extends ODKSQLiteOpenHelper {
 
 		DatabaseHelper() {
@@ -97,6 +113,7 @@ public class ClinicAdapter {
 			db.execSQL(CREATE_OBSERVATIONS_TABLE);
 			db.execSQL(CREATE_COHORTS_TABLE);
 			db.execSQL(CREATE_FORMS_TABLE);
+			db.execSQL(CREATE_FORMINSTANCES_TABLE);
 		}
 
 		@Override
@@ -106,6 +123,7 @@ public class ClinicAdapter {
 			db.execSQL("DROP TABLE IF EXISTS " + OBSERVATIONS_TABLE);
 			db.execSQL("DROP TABLE IF EXISTS " + COHORTS_TABLE);
 			db.execSQL("DROP TABLE IF EXISTS " + FORMS_TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + FORMINSTANCES_TABLE);
 			onCreate(db);
 		}
 	}
@@ -216,6 +234,24 @@ public class ClinicAdapter {
 
 	    return id;
 	}
+	
+	public long createFormInstance(FormInstance instance) {
+	    ContentValues cv = new ContentValues();
+
+	    cv.put(KEY_PATIENT_ID, instance.getPatientId());
+	    cv.put(KEY_FORM_ID, instance.getFormId());
+	    cv.put(KEY_FORMINSTANCE_STATUS, instance.getStatus());
+	    cv.put(KEY_FORMINSTANCE_PATH, instance.getPath());
+
+	    long id = -1;
+	    try {
+	        id = mDb.insert(FORMINSTANCES_TABLE, null, cv);
+	    } catch (SQLiteConstraintException e) {
+	        Log.e(t, "Caught SQLiteConstraitException: " + e);
+	    }
+
+	    return id;
+	}
 
 	/**
 	 * Remove all patients from the database.
@@ -236,6 +272,16 @@ public class ClinicAdapter {
 	
 	public boolean deleteAllForms() {
 	    return mDb.delete(FORMS_TABLE, null, null) > 0;
+	}
+
+	public boolean deleteAllFormInstances() {
+	    return mDb.delete(FORMINSTANCES_TABLE, null, null) > 0;
+	}
+	
+	public boolean deleteFormInstance(Integer patientId, Integer formId) {
+	    return mDb.delete(FORMINSTANCES_TABLE,
+	            KEY_PATIENT_ID + "=" + patientId + " AND " + KEY_FORM_ID
+                + "=" + formId, null) > 0;
 	}
 	
 	/**
@@ -346,6 +392,43 @@ public class ClinicAdapter {
         c = mDb.query(true, FORMS_TABLE, new String[] { KEY_ID,
                 KEY_FORM_ID, KEY_FORM_NAME, KEY_FORM_PATH },
                 null, null, null, null, null, null);
+
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
+    }
+    
+    public Cursor fetchForm(Integer formId) throws SQLException {
+        Cursor c = null;
+        c = mDb.query(true, FORMS_TABLE, new String[] { KEY_ID,
+                KEY_FORM_NAME, KEY_FORM_PATH },
+                KEY_FORM_ID + "=" + formId, null, null, null, null, null);
+
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
+    }
+    
+    public Cursor fetchFormInstance(Integer patientId, Integer formId) throws SQLException {
+        Cursor c = null;
+        c = mDb.query(true, FORMINSTANCES_TABLE, new String[] { KEY_ID,
+                KEY_FORMINSTANCE_STATUS, KEY_FORMINSTANCE_PATH },
+                KEY_PATIENT_ID + "=" + patientId + " AND " + KEY_FORM_ID
+                        + "=" + formId, null, null, null, null, null);
+
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
+    }
+    
+    public Cursor fetchFormInstances(Integer patientId) throws SQLException {
+        Cursor c = null;
+        c = mDb.query(true, FORMINSTANCES_TABLE, new String[] { KEY_ID,
+                KEY_FORM_ID, KEY_FORMINSTANCE_STATUS, KEY_FORMINSTANCE_PATH },
+                KEY_PATIENT_ID + "=" + patientId, null, null, null, null, null);
 
         if (c != null) {
             c.moveToFirst();

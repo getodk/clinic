@@ -40,7 +40,7 @@ public abstract class DownloadTask extends
 		}
 	}
 
-	public void setServerConnectionListener(DownloadListener sl) {
+	public void setDownloadListener(DownloadListener sl) {
 		synchronized (this) {
 			mStateListener = sl;
 		}

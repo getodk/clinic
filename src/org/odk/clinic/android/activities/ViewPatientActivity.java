@@ -229,8 +229,10 @@ public class ViewPatientActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_FORMS:
+                String patientIdStr = mPatient.getPatientId().toString();
                 Intent ip = new Intent(getApplicationContext(),
                         ListFormActivity.class);
+                ip.putExtra(Constants.KEY_PATIENT_ID, patientIdStr);
                 startActivity(ip);
                 return true;
             default:

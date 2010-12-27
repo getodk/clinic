@@ -25,7 +25,7 @@ the License.
 <string name="default_password">test</string>
 <string name="default_server">http://rwinkwavu.cs.washington.edu:8080/openmrs</string>
 <string name="default_username">admin</string>
-<string name="downloading">Downloading %s...</string>
+<string name="downloading">Downloading %s...</string><string name="please_wait">Please wait a few moments.</string>
 <string name="download_patients">Download Patients</string>
 <string name="download_selected">Download Selected</string>
 <string name="error">Error: %s</string>
