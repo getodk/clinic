@@ -13,7 +13,7 @@ import org.odk.clinic.android.openmrs.Constants;
 import org.odk.clinic.android.openmrs.Form;
 import org.odk.clinic.android.openmrs.FormInstance;
 import org.odk.clinic.android.tasks.InstanceLoaderTask;
-import org.odk.clinic.android.tasks.UploadFormTask;
+import org.odk.clinic.android.tasks.UploadInstanceTask;
 import org.odk.clinic.android.utilities.FileUtils;
 
 import android.app.AlertDialog;
@@ -64,7 +64,7 @@ public class ListFormActivity extends ListActivity implements InstanceLoaderList
     private ProgressDialog mProgressDialog;
     
     private InstanceLoaderTask mInstanceLoaderTask;
-    private UploadFormTask mUploadFormTask;
+    private UploadInstanceTask mUploadFormTask;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +93,8 @@ public class ListFormActivity extends ListActivity implements InstanceLoaderList
         Object data = getLastNonConfigurationInstance();
         if (data instanceof InstanceLoaderTask) {
             mInstanceLoaderTask = (InstanceLoaderTask) data;
-        } else if (data instanceof UploadFormTask) {
-            mUploadFormTask = (UploadFormTask) data;
+        } else if (data instanceof UploadInstanceTask) {
+            mUploadFormTask = (UploadInstanceTask) data;
         }
     }
     
@@ -256,7 +256,7 @@ public class ListFormActivity extends ListActivity implements InstanceLoaderList
         url.append(settings.getString(PreferencesActivity.KEY_PASSWORD,
                 getString(R.string.default_password)));
 
-        mUploadFormTask = new UploadFormTask();
+        mUploadFormTask = new UploadInstanceTask();
         mUploadFormTask.setUploadListener(this);
         mUploadFormTask.setUploadServer(url.toString());
         mUploadFormTask.execute(instancePath);
@@ -478,7 +478,7 @@ public class ListFormActivity extends ListActivity implements InstanceLoaderList
     }
 
     @Override
-    public void uploadComplete(String result) {
+    public void uploadComplete(ArrayList<String> result) {
         dismissDialog(UPLOAD_DIALOG);
         // TODO Toast message?
     }
