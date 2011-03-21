@@ -84,7 +84,7 @@ public class Constants {
 	public static final String FORM_DOWNLOAD_URL = "/moduleServlet/xforms/xformDownload?target=xform&excludeLayout=true";
 	
 	public static final String INSTANCE_UPLOAD_URL = "/moduleServlet/xforms/xformDataUpload";
-
+	
 	public static final int TYPE_STRING = 1;
 	public static final int TYPE_INT = 2;
 	public static final int TYPE_FLOAT = 3;

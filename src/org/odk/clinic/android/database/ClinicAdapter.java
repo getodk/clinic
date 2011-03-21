@@ -435,6 +435,40 @@ public class ClinicAdapter {
         }
         return c;
     }
+    
+    public Cursor fetchFormInstancesByStatus(String	status) throws SQLException {
+        Cursor c = null;
+        c = mDb.query(true, FORMINSTANCES_TABLE, new String[] { KEY_ID,
+                KEY_FORM_ID, KEY_FORMINSTANCE_STATUS, KEY_FORMINSTANCE_PATH },
+                KEY_FORMINSTANCE_STATUS + "='" + status +"'", null, null, null, null, null);
+
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
+    }
+    
+    public Cursor fetchFormInstancesByPath(String path) throws SQLException {
+        Cursor c = null;
+        c = mDb.query(true, FORMINSTANCES_TABLE, new String[] { KEY_ID,
+                KEY_FORM_ID, KEY_FORMINSTANCE_STATUS, KEY_FORMINSTANCE_PATH },
+                KEY_FORMINSTANCE_PATH + "='" + path +"'", null, null, null, null, null);
+
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
+    }
+    
+    public boolean updateFormInstance(String path, String status) {
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(KEY_FORMINSTANCE_STATUS, status);
+
+        return mDb.update(FORMINSTANCES_TABLE, cv, KEY_FORMINSTANCE_PATH + "='" + path + "'", null) > 0;
+    }
+
 
 	/**
 	 * Update patient in the database.

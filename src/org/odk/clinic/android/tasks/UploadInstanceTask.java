@@ -38,7 +38,6 @@ public class UploadInstanceTask extends AsyncTask<String, String, ArrayList<Stri
     protected ArrayList<String> doInBackground(String... params) {
         ArrayList<String> uploadedIntances = new ArrayList<String>();
         int instanceCount = params.length;
-        
         for (int i = 0; i < instanceCount; i++) {
 
             // configure connection
@@ -56,9 +55,10 @@ public class UploadInstanceTask extends AsyncTask<String, String, ArrayList<Stri
 
             // find all files in parent directory
             File[] files = file.getParentFile().listFiles();
+            System.out.println(file.getAbsolutePath());
             if (files == null) {
-                Log.e(tag, "no files to upload");
-                cancel(true);
+                Log.e(tag, "no files to upload in istance");
+                continue;
             }
 
             // mime post
@@ -121,9 +121,10 @@ public class UploadInstanceTask extends AsyncTask<String, String, ArrayList<Stri
             Log.e(tag, "Response code:" + responseCode);
 
             // verify that your response came from a known server
-            if (serverLocation != null && mUrl.contains(serverLocation) && responseCode == 201) {
+            if (serverLocation != null && mUrl.contains(serverLocation)) {
                 uploadedIntances.add(params[i]);
             }
+            uploadedIntances.add(params[i]);
 
         }
 
@@ -144,6 +145,7 @@ public class UploadInstanceTask extends AsyncTask<String, String, ArrayList<Stri
 
     @Override
     protected void onPostExecute(ArrayList<String> result) {
+    	System.out.println("Gathaiya ziko: " + result.size());
         synchronized (this) {
             if (mStateListener != null)
                 mStateListener.uploadComplete(result);
