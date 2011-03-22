@@ -46,5 +46,5 @@
 	
 	<uses-permission xmlns:android="http://schemas.android.com/apk/res/android" android:name="android.permission.INTERNET"/>
 	<uses-sdk android:minSdkVersion="3"></uses-sdk>
-	
+	<supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" />
 </manifest>
