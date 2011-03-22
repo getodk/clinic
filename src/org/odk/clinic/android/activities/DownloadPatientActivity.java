@@ -95,7 +95,6 @@ public class DownloadPatientActivity extends Activity implements
     
     private void downloadPatients()
     {   
-        System.out.println("Thaiya am here - downloading patients");
         if (mDownloadTask != null)
             return;
         
@@ -159,7 +158,6 @@ public class DownloadPatientActivity extends Activity implements
         
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            System.out.println("Gathaiya ndi haha and which = " + which);
             if (which >= 0) {
                 Cohort c = mCohorts.get(which);
                 
@@ -210,7 +208,6 @@ public class DownloadPatientActivity extends Activity implements
             
             int selectedCohortIndex = -1;
             String[] cohortNames = new String[mCohorts.size()];
-            System.out.println("Thaiya am here - mcohorts size=" + mCohorts.size());
             for (int i = 0; i < mCohorts.size(); i++) {
                 Cohort c = mCohorts.get(i);
                 cohortNames[i] = c.getName();

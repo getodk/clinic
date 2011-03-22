@@ -158,7 +158,7 @@ public class ListPatientActivity extends ListActivity implements UploadFormListe
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_DOWNLOAD, 0, getString(R.string.download_patients))
-				.setIcon(R.drawable.ic_menu_invite);
+				.setIcon(R.drawable.ic_menu_allfriends);
 		menu.add(0, MENU_UPLOAD, 0, getString(R.string.upload_patients))
 				.setIcon(android.R.drawable.ic_menu_upload);
 		menu.add(0, MENU_NEWPATIENT, 0, getString(R.string.new_patient))
