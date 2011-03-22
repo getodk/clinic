@@ -85,7 +85,12 @@ public class ListFormActivity extends ListActivity implements InstanceLoaderList
 
         // TODO Check for invalid patient IDs
         String patientIdStr = getIntent().getStringExtra(Constants.KEY_PATIENT_ID);
-        mPatientId = Integer.valueOf(patientIdStr);
+        try {
+        	mPatientId = Integer.valueOf(patientIdStr);
+        }catch (NumberFormatException e) {
+			mPatientId = null;
+			//here the id is empty meaning its a new patient
+		}
         
         setTitle(getString(R.string.app_name) + " > "
                 + getString(R.string.forms));
@@ -207,7 +212,7 @@ public class ListFormActivity extends ListActivity implements InstanceLoaderList
         String time =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
                     .format(Calendar.getInstance().getTime());
-        String instanceName = form.getFormId() + "_" + patientId + "_" + time;
+        String instanceName = form.getFormId() + "_" + (patientId!=null?patientId:"new") + "_" + time;
         
         String path = FileUtils.INSTANCES_PATH + instanceName;
         if (FileUtils.createFolder(path)) {
@@ -215,7 +220,7 @@ public class ListFormActivity extends ListActivity implements InstanceLoaderList
             
             // Save form instance to db
             fi = new FormInstance();
-            fi.setPatientId(patientId);
+            fi.setPatientId(patientId!=null?patientId:0);
             fi.setFormId(form.getFormId());
             fi.setPath(instancePath);
             fi.setStatus(ClinicAdapter.STATUS_INITIALIZED);
@@ -228,7 +233,7 @@ public class ListFormActivity extends ListActivity implements InstanceLoaderList
             // Start instance loader task
             mInstanceLoaderTask = new InstanceLoaderTask();
             mInstanceLoaderTask.setInstanceLoaderListener(this);
-            mInstanceLoaderTask.execute(form.getPath(), instancePath, patientId.toString());
+            mInstanceLoaderTask.execute(form.getPath(), instancePath, patientId!=null?patientId.toString():null);
             showDialog(PROGRESS_DIALOG);
         }
     }

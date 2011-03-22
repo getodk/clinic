@@ -34,7 +34,12 @@ public class InstanceLoaderTask extends AsyncTask<String, String, String> {
         String formPath = path[0];
         String instancePath = path[1];
         String patientIdStr = path[2];
-        Integer patientId = Integer.valueOf(patientIdStr);
+        Integer patientId = null;
+        try {
+        	patientId = Integer.valueOf(patientIdStr);
+        }catch (NumberFormatException e) {
+			// TODO: handle exception
+		}
 
         // Load form
         try {
@@ -55,7 +60,9 @@ public class InstanceLoaderTask extends AsyncTask<String, String, String> {
             fd.initialize(true);
             
             org.javarosa.core.model.instance.FormInstance datamodel = fd.getInstance();
-            injectPatientId(datamodel, patientId);
+            
+            if (patientId != null)
+            	injectPatientId(datamodel, patientId);
             
             // Save form instance
             ByteArrayPayload payload;

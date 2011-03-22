@@ -57,4 +57,9 @@ the License.
 <string name="download_forms">Download Forms</string>
 <string name="select_forms">Select Forms</string>
 <string name="no_form">No forms. Try refreshing.</string>
+<string name="new_patient">Create Patient</string>
+<string name="upload_patients">Upload Patients</string>
+<string name="uploading_patients">Uploading Patients...</string>
+<string name="upload_all_successful">%s patient(s) uploaded successfully.</string>
+<string name="upload_some_failed">Sorry, %s patient(s) failed to upload!</string>
 </resources>
